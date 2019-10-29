@@ -1,4 +1,4 @@
-"""Tools for working with High Contrast Imaging Testbed data."""
+"""HTTP client library for NKT SuperK lasers based on go-hcit."""
 
 try:
     from setuptools import setup
