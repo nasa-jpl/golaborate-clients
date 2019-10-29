@@ -7,4 +7,4 @@ except ImportError:
     use_setuptools()
     from setuptools import setup
 
-setup(use_scm_version=True)
+setup(use_scm_version=False)
