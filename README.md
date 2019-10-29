@@ -96,6 +96,8 @@ To "install":
 addpath('../matlab/nkt')
 ```
 
+To use:
+
 ```matlab
 % yourStruct could be a testbed struct, config, whatever.
 % We just look for this one field.
