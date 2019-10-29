@@ -102,24 +102,24 @@ addpath('../matlab/nkt')
 s = struct()
 s.NKTSuperKRoot = "http://misery.jpl.nasa.gov:8080/omc/nkt"
 
-# get the power level
+% get the power level
 nktPowerGet(s)
 >>> ans = 40.0
 
-# set the power level
+% set the power level
 nktPowerSet(s, 40)
 
-# is the laser on?
+% is the laser on?
 nktGetEmission(s)
 >>> ans = 1 % logicals are 1 or 0 in matlab
 
-# turn it off
+% turn it off
 nktEmissionOff(s)
 
-# on again
+% on again
 nktEmissionOn(s)
 
-# how is the VARIA configured?
+% how is the VARIA configured?
 nktCenterBandwidthGet(s)
 >>> ans =
     struct with fields:
@@ -127,18 +127,18 @@ nktCenterBandwidthGet(s)
            center: 575,
         bandwidth: 64
 
-# change the wavelength
+% change the wavelength
 nktCenterBandwidthSet(s, 600, 20)
 
 
-# adjust the VARIA ND if one is present
+% adjust the VARIA ND if one is present
 nktNDSet(s, 10)
 
-# see the value of the ND
+% see the value of the ND
 nktNDGet(s)
 >>> ans = 10.0
 
-# are there errors on the main module?
+% are there errors on the main module?
 nktMainModuleStatus(s)
 >>> ans =
 
@@ -156,7 +156,7 @@ nktMainModuleStatus(s)
                                     SupplyVoltageLow: 0
                               SystemErrorCodePresent: 0
 
-# on the VARIA
+% on the VARIA
 nktVariaStatus(s)
 >>> ans =
 
