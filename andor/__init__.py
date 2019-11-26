@@ -294,7 +294,7 @@ class SDK3Cam:
             the format to retrieve the image as.
             If fits, the ret parameter is used, otherwise it is ignored.
             Fit images are captured with 16-bit precision, other options are 8-bit.
-        ret : `str`, {'array', 'hdu', optional
+        ret : `str`, {'array', 'hdu', 'file'}, optional
             Only used if fmt='fits'.
             If array, returns a numpy array
             If hdu, returns an astropy.io.fits.HDU object.  The user is
