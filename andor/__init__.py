@@ -205,7 +205,7 @@ class SDK3Cam:
             raise_err(resp)
             return
 
-    def sensor_cooling(self, on=False):
+    def sensor_cooling(self, on=None):
         """Turns the TEC cooler on or off (on != None), or checks if it's on (true).
 
         Parameters
@@ -263,7 +263,7 @@ class SDK3Cam:
             raise_err(resp)
             return resp.json()['str']
         else:
-            resp = requests.get(url, data={'str': valueS})
+            resp = requests.post(url, data={'str': valueS})
             raise_err(resp)
             return
 
