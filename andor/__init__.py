@@ -35,7 +35,7 @@ def raise_err(resp):
 
     """
     if resp.status_code != 200:
-        raise Exception(str(resp.content).strip())
+        raise Exception(resp.content.decode('UTF-8').rstrip())
 
 
 def proces_exposure_time(t):
