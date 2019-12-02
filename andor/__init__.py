@@ -150,6 +150,27 @@ class SDK3Cam:
         k = keys[0]
         return d[k]
 
+    def get_feature_info(self, feature):
+        """Get the type and allowable range for a feature on the camera.
+
+        Parameters
+        ----------
+        feature : `str`
+            a feature that is a valid key to self.features
+
+        Returns
+        -------
+        `dict`
+            with keys `type`.  May also include keys `min` and `max` for
+            numerical features, or a key of "options" for enums, and "maxLength"
+            for strings
+
+        """
+        url = f'{self.addr}/feature/{feature}/options'
+        resp = requests.get(url)
+        raise_err(resp)
+        return resp.json()
+
     def exposure_time(self, t=None):
         """Get or set the exposure time.  If t=None, gets.  If t!=None, sets.
 
