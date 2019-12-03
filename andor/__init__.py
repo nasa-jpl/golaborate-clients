@@ -117,12 +117,12 @@ class SDK3Cam:
         # andor-http server requires us to properly tag the datatype
         if isinstance(value, str):
             key = 'str'
+        elif isinstance(value, bool):
+            key = 'bool'
         elif isinstance(value, float):
             key = 'f64'
         elif isinstance(value, int):
             key = 'int'
-        elif isinstance(value, bool):
-            key = 'bool'
 
         payload = {key: value}
         resp = requests.post(url, json=payload)
