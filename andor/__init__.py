@@ -222,7 +222,7 @@ class SDK3Cam:
             raise_err(resp)
             return resp.json()['bool']
         else:
-            resp = requests.get(url, json={'bool': on})
+            resp = requests.post(url, json={'bool': on})
             raise_err(resp)
             return
 
@@ -246,7 +246,7 @@ class SDK3Cam:
             raise_err(resp)
             return resp.json()['bool']
         else:
-            resp = requests.get(url, json={'bool': on})
+            resp = requests.post(url, json={'bool': on})
             raise_err(resp)
             return
 
