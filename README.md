@@ -65,7 +65,20 @@ hdu[0].data.shape, hdu[0].data.dtype
 # closing the HDU is your responsibility
 hdu.close()
 
+# or, if you want to write to disk
+from io import BytesIO
+from astropy.io import fits
+contents_of_a_fits_file = cam.snap(fmt='fits', ret='file')
+with open('tmp.fits', 'wb') as fid:
+    fid.write(contents_of_a_fits_file)
+
+readable = BytesIO(contents_of_a_fits_file)
+with fits.open(readable) as hdu:
+    # do something with the hdu
+    ary = hdu[0].data
+
 # cam.snap takes an exposure time as the first argument, if None it doesn't update texp.
+# set texp without taking a frame:
 cam.exposure_time()
 >>> 2e-4 # seconds
 
