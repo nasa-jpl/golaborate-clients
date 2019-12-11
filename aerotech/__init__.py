@@ -1,20 +1,22 @@
-"""Aerotech enables nice control of Aerotech Ensemble controllers (and stages)
-over HTTP via a go-hcit server."""
+"""Aerotech enables nice control of Aerotech Ensemble controllers (and stages) over HTTP via a go-hcit server."""
 
 import requests
 
 
 def raise_err(resp):
-    """Raises an exception if the response status code is not 200.
+    """Raise an exception if the response status code is not 200.
+
     Parameters
     ----------
     resp : `requests.Response`
         a response with a status code
+
     Raises
     ------
     Exception
     any errors encountered, whether they are in communciation with the
     server or between the server and the camera/SDK
+
     """
     if resp.status_code != 200:
         raise Exception(resp.content.decode('UTF-8').rstrip())
@@ -31,6 +33,8 @@ def _niceaddr(addr):
 
 
 class Axis:
+    """Axis represnets an axis of an aerotech stage."""
+
     def __init__(self, addr, name):
         """Create a new Axis instance.
 
@@ -68,14 +72,14 @@ class Axis:
 
     @property
     def pos(self):
-        """The current position of the axis."""
+        """Position of the axis."""
         url = f'{self.addr}/axis/{self.name}/pos'
         resp = requests.get(url)
         raise_err(resp)
         return resp.json()['f64']
 
     def move_abs(self, pos):
-        """Move the axis to an absolute position
+        """Move the axis to an absolute position.
 
         Parameters
         ----------
@@ -84,12 +88,12 @@ class Axis:
 
         """
         url = f'{self.addr}/axis/{self.name}/pos'
-        payload = {'f64': pos}
+        payload = {'f64': float(pos)}
         resp = requests.post(url, json=payload)
         raise_err(resp)
 
     def move_rel(self, pos):
-        """Move the axis by a relative amount
+        """Move the axis by a relative amount.
 
         Parameters
         ----------
@@ -98,12 +102,14 @@ class Axis:
 
         """
         url = f'{self.addr}/axis/{self.name}/pos'
-        payload = {'f64': pos}
+        payload = {'f64': float(pos)}
         resp = requests.post(url, json=payload, params={'relative': True})
         raise_err(resp)
 
 
 class Ensemble:
+    """Ensemble represents an Ensemble motion controller."""
+
     def __init__(self, addr, axes=['X', 'Y', 'Z']):
         """Create a new Ensemble instance.
 
