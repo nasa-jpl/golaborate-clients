@@ -1,5 +1,5 @@
 function ary = andorGetFrame(s, fileName)
-    websave(fileName, strcat(s.CameraURL, "/image"), "fmt", "fits")
+    websave(fileName, [s.CameraURL,'/image'], 'fmt', 'fits');
     ary = fitsread(fileName);
 end
 
