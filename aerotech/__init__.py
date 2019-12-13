@@ -66,9 +66,17 @@ class Axis:
     def disable(self):
         """Disable the axis."""
         url = f'{self.addr}/axis/{self.name}/enabled'
-        payload = {'bool': True}
+        payload = {'bool': False}
         resp = requests.post(url, json=payload)
         raise_err(resp)
+
+    @property
+    def enabled(self):
+        """Boolean for if the axis is enabled."""
+        url = f'{self.addr}/axis/{self.name}/enabled'
+        resp = requests.get(url)
+        raise_err(resp)
+        return resp.json()['bool']
 
     @property
     def pos(self):
@@ -121,4 +129,6 @@ class Ensemble:
         """
         self.addr = _niceaddr(addr)
         for axis in axes:
-            setattr(self, axis, Axis(self.addr, axis))
+            ax = Axis(self.addr, axis)
+            setattr(self, axis, ax)
+            setattr(self, axis.lower(), ax)
