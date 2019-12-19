@@ -11,7 +11,7 @@ function ret = andorSetFeature(s,featurename,value)
 %       ret - response from webwrite 
 %
 
-    listOfFeatureTypes = webread([s.CameraURL,'/feature']);
+    listOfFeatureTypes = webread(strcat(s.CameraURL, '/feature'));
     featuretype = eval(['listOfFeatureTypes.',featurename]);
 
     %- Get featuretype key 
@@ -26,7 +26,7 @@ function ret = andorSetFeature(s,featurename,value)
     end
     
     options = weboptions('MediaType', 'application/json');
-    url = [s.CameraURL,'/feature/',featurename];
+    url = strcat(s.CameraURL, '/feature/', featurename);
     if(strcmp(featurekey,'str'))
         s_tmp.str = value;
     elseif(strcmp(featurekey,'bool'))
