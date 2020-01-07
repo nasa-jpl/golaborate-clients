@@ -52,7 +52,6 @@ class Axis:
     def home(self):
         """Home the axis."""
         url = f'{self.addr}/axis/{self.name}/home'
-        print(url)
         resp = requests.post(url)
         raise_err(resp)
 
