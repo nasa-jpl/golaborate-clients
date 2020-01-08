@@ -78,10 +78,13 @@ class ITC4000:
                 return u.mA * val
 
         if isinstance(value, u.Quantity):
-            value = value.to(u.mA)
-            payload = {'f64': value}
-            resp = requests.post(url, json=payload)
-            raise_err(resp)
+            value = float(value.to(u.mA))
+        else:
+            value = float(value)
+
+        payload = {'f64': value}
+        resp = requests.post(url, json=payload)
+        raise_err(resp)
 
     def emission(self, value=None):
         """Get or set the emission status.
