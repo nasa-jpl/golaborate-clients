@@ -1,5 +1,4 @@
 """cryocon expresses reading of Cryocon Model 12~18i+ monitors over HTTP."""
-
 import requests
 
 
@@ -23,6 +22,8 @@ def raise_err(resp):
 
 
 class TemperatureMonitor:
+    """Client class for talking to a temperature monitor through a server."""
+
     def __init__(self, addr):
         """Create a new TemperatureMonitor instance.
 
