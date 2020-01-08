@@ -11,7 +11,8 @@ To install:
 pip install git+https://github.jpl.nasa.gov/HCIT/client-aerotech
 ```
 
-### Basic Usage
+To use:
+
 ```python
 import aerotech
 
@@ -51,6 +52,39 @@ x.disable()
 x.enable()
 ```
 
+
+## Matlab example
+
+```matlab
+% begin by making a struct for the axis, with two fields:
+s = struct();
+s.ControllerURL = 'http://malady:8002'
+s.Axis = 'X'
+
+% get the position
+aerotechGetPos(s)
+>>> 3.9
+
+% absolute move, mm
+aerotechMoveAbs(s, 5)
+aerotechGetPos(s)
+>>> 5
+
+% relative move, mm
+aerotechMoveRel(s, 1)
+aerotechGetPos(s)
+>>> 6
+
+% home
+aerotechHome(s)
+aerotechGetPos(s)
+>>> 0
+
+% enable/disable
+aerotechGetEnabled(s)
+>>> 1
+aerotechSetEnabled(s, 0) % 0 == logical false == disable, 1 to enable
+```
 
 ## There was an error
 
