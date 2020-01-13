@@ -71,7 +71,98 @@ def proces_exposure_time(t):
     return t
 
 
+class Recorder:
+    """Recoder is an interface to the autorecorder on the server, which saves every FITS file to disk."""
+
+    def __init__(self, addr):
+        """Create a new Recorder instance.
+
+        Parameters
+        ----------
+        addr : `str`
+            the URL the go-hcit server is running on, with any stem for the recorder.
+            The route addr/autowrite should exist.
+
+        """
+        self.addr = addr
+
+    def root(self, srvpath=None):
+        """Get (srvpath=None) or set the root folder to backup to.
+
+        Parameters
+        ----------
+        srvpath : `str`
+            path *on the server* to store backups in
+
+        Returns
+        -------
+        `str`
+            the path that files are saved to
+
+        """
+        url = f'{self.addr}/autowrite/root'
+        if srvpath is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()['str']
+        else:
+            payload = {'str': srvpath}
+            resp = requests.post(url, json=payload)
+            raise_err(resp)
+
+    def prefix(self, string=None):
+        """Get (string=None) or set the filename prefix to backup to.
+
+        Parameters
+        ----------
+        string : `str`
+            prefix to use when naming files, prefix00000x.fits
+
+        Returns
+        -------
+        `str`
+            the prefix that is currently in use
+
+        """
+        url = f'{self.addr}/autowrite/prefix'
+        if string is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()['str']
+        else:
+            payload = {'str': string}
+            resp = requests.post(url, json=payload)
+            raise_err(resp)
+
+    def enabled(self, boolean=None):
+        """Enable/Disable the recorder, or check if it is enabled.
+
+        Parameters
+        ----------
+        boolean : `bool`
+            if None, get.  Else set.
+
+        Returns
+        -------
+        `bool`
+            whether the recorder is enabled
+
+        """
+        url = f'{self.addr}/autowrite/enabled'
+        if boolean is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()['bool']
+        else:
+            payload = {'bool': boolean}
+            resp = requests.post(url, json=payload)
+            raise_err(resp)
+
+
+
 class SDK3Cam:
+    """SDK3Cam is a wrapper around a camera from andor SDK3 v3 through go-hcit."""
+
     def __init__(self, addr, time_convention='float'):
         """Create a new SDK3Cam instance.
 
@@ -93,6 +184,7 @@ class SDK3Cam:
 
         self.addr = addr
         self.time_convention = time_convention
+        self.recorder = Recorder(addr)
 
     # generics
     @property
