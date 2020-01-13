@@ -11,7 +11,7 @@ function val = andorGetFeature(s,featurename)
 
     % Get feature type from SDK
     listOfFeatureTypes = webread(strcat(s.CameraURL, '/feature'));
-    featuretype = eval(['listOfFeatureTypes.',featurename]);
+    featuretype = eval(strcat('listOfFeatureTypes.',featurename));
 
     %- Get featuretype key 
     if(strcmp(featuretype,'int'))
