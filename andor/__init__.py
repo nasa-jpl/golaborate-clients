@@ -539,5 +539,29 @@ class Camera:
         raise_err(resp)
         return resp.json()
 
+    # this is shutter control
+    def shutter(self, open=None):
+        """Get or set the EM gain mode.  Get if mode=None, else Set.
+
+        Parameters
+        ----------
+        mode : `str`, {'Advanced'}
+            em gain mode
+
+        Returns
+        -------
+        `str`
+            the current EM gain mode
+
+        """
+        url = f'{self.addr}/shutter'
+        if open is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()['bool']
+        else:
+            resp = requests.post(url, json={'bool': open})
+            raise_err(resp)
+
 
 SDK3Cam = Camera
