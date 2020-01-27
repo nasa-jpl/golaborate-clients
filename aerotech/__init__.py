@@ -85,6 +85,43 @@ class Axis:
         raise_err(resp)
         return resp.json()['f64']
 
+    @property
+    def limits(self):
+        """Limits of the axis."""
+        resp = requests.get(f'{self.addr}/axis/{self.name}/limits')
+        raise_err(resp)
+        return resp.json()
+
+    def velocity(self, value=None):
+        """Velocity setpoint of the axis.
+
+        Parameters
+        ----------
+        value: `float`
+            velocity of the axis, in mm/s
+
+        Returns
+        -------
+        `float`
+            velocity, if value=None
+
+        """
+        url = f'{self.addr}/axis/{self.name}/vel'
+        if value is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()['f64']
+        else:
+            payload = {'f64': value}
+            resp = requests.post(url, json=payload)
+            raise_err(resp)
+
+    @property
+    def limits(self):
+        """Server/software imposed travel limits."""
+        resp = requests.get(f'{self.addr}/axis/{self.name}/limits')
+        return resp.json()
+
     def move_abs(self, pos):
         """Move the axis to an absolute position.
 
