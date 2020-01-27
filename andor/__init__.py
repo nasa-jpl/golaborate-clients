@@ -295,6 +295,31 @@ class Camera:
             raise_err(resp)
             return
 
+    def aoi(self, dict_=None):
+        """Get or set the area of interest (AoI).  If dict_=None, gets.  If dict_!=None, sets.
+
+        Parameters
+        ----------
+        dict_ : `dict`
+            dictionary with keys left, top, width, height.
+            Not all keys are needed.  Partial updates are allowed.
+
+
+        Returns
+        -------
+        dict_ : `dict`
+            dictionary with keys left, top, width, height.
+
+        """
+        url = f'{self.addr}/aoi'
+        if dict_ is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()
+        else:
+            resp = requests.post(url, json=dict_)
+            raise_err(resp)
+
     # thermal
     def fan(self, on=None):
         """Turns the fan on or off (on != None), or checks if it's on (true).
