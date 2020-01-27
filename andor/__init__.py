@@ -8,6 +8,8 @@
 import numbers
 from io import BytesIO
 
+import numpy as np
+
 from astropy import units as u
 from astropy.io import fits
 
@@ -20,7 +22,7 @@ import requests
 
 
 def raise_err(resp):
-    """Raises an exception if the response status code is not 200.
+    """Raise an exception if the response status code is not 200.
 
     Parameters
     ----------
@@ -159,12 +161,11 @@ class Recorder:
             raise_err(resp)
 
 
-
-class SDK3Cam:
-    """SDK3Cam is a wrapper around a camera from andor SDK3 v3 through go-hcit."""
+class Camera:
+    """Camera is a wrapper around a camera from andor SDK3 v3 through go-hcit."""
 
     def __init__(self, addr, time_convention='float'):
-        """Create a new SDK3Cam instance.
+        """Create a new Camera instance.
 
         Parameters
         ----------
@@ -395,8 +396,9 @@ class SDK3Cam:
         return resp.json()['str']
 
     # imaging
+
     def snap(self, exposure_time=None, fmt='fits', ret='array'):
-        """Take an image and return something that depends on the arguments
+        """Take an image and return something that depends on the arguments.
 
         Parameters
         ----------
@@ -443,3 +445,99 @@ class SDK3Cam:
                 return hdu
         else:
             return imread(resp.content, format=fmt)
+
+    def snap2(self, exposure_time=None, ret='array'):
+        """Snap, but with logic to handle automatic image rotation.
+
+        Parameters
+        ----------
+        exposure_time : `str`, `numbers.Number`, or `astropy.units.Quantity`
+            something process_exposure_time can turn into the format expected
+            by the server.  See help(andor.process_exposure_time).
+        fmt : `str`, {'fits', 'jpg', 'png'}, optional
+            the format to retrieve the image as.
+            If fits, the ret parameter is used, otherwise it is ignored.
+            Fit images are captured with 16-bit precision, other options are 8-bit.
+        ret : `str`, {'array', 'hdu', 'file'}, optional
+            If array, returns a numpy array
+            If hdu, returns an astropy.io.fits.HDU object.  The user is
+            responsible for closing it when finished.
+
+        Returns
+        -------
+        `numpy.ndarray` or `astropy.io.fits.HDU`
+            either an array holding the image data as uint8 or uint16,
+            or an HDU object. Users must close the HDU object.
+
+        """
+        hdu = self.snap(exposure_time, ret='hdu')
+        try:
+            orientation = hdu[0].header['ORIENT']
+        except KeyError:
+            orientation = 90
+
+        k = orientation // 90
+        if k != 0:
+            hdu[0].data = np.rot90(hdu[0].data, k)
+
+        if ret == 'array':
+            return hdu[0].data
+        else:
+            return hdu
+
+    # this is EMCCD stuff
+    def em_gain(self, fctr=None):
+        """Get or set the EM gain.  Get if fctr=None, else Set.
+
+        Parameters
+        ----------
+        fctr : `int`
+            gain factor, [0,300] if self.em_mode() != 'Advanced', else [0,1000].
+
+        Returns
+        -------
+        `int`
+            the EM gain
+
+        """
+        url = f'{self.addr}/em-gain'
+        if fctr is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()['int']
+        else:
+            resp = requests.post(url, json={'int': fctr})
+            raise_err(resp)
+
+    def em_gain_mode(self, mode=None):
+        """Get or set the EM gain mode.  Get if mode=None, else Set.
+
+        Parameters
+        ----------
+        mode : `str`, {'Advanced'}
+            em gain mode
+
+        Returns
+        -------
+        `str`
+            the current EM gain mode
+
+        """
+        url = f'{self.addr}/em-gain-mode'
+        if mode is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()['str']
+        else:
+            resp = requests.post(url, json={'str': mode})
+            raise_err(resp)
+
+    @property
+    def em_gain_range(self):
+        """The min and max values for EM gain in the current configuration."""
+        resp = requests.get(f'{self.addr}/em-gain-range')
+        raise_err(resp)
+        return resp.json()
+
+
+SDK3Cam = Camera
