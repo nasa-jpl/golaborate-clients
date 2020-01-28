@@ -106,7 +106,7 @@ class Axis:
             velocity, if value=None
 
         """
-        url = f'{self.addr}/axis/{self.name}/vel'
+        url = f'{self.addr}/axis/{self.name}/velocity'
         if value is None:
             resp = requests.get(url)
             raise_err(resp)
