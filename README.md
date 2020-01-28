@@ -165,3 +165,25 @@ cam.get_feature_info('TemperatureControl')
 # numerical
 cam.get_feature_info('ExposureTime')
 >>> {'max': 19841.549026929577, 'min': 9.23943661971831e-06, 'type': 'float'}
+
+#### EMCCD controls
+
+```python
+
+# get the EM gain
+cam.em_gain()
+>>> 1
+
+# what is the allowed range?
+cam.em_gain_range()
+>>> {'min': 1, 'max': 300}
+
+# set it, don't fry the camera by doing this without caution
+cam.em_gain(2)
+
+# what is the mode?
+cam.em_gain_mode()
+>>> TODO: a string
+
+# set it to Andor's "REALGAIN" mode
+cam.em_gain_mode("Real")
