@@ -34,14 +34,23 @@ x.pos, y.pos, z.pos
 >>> (3.9, 4.1, 5.2)
 
 # you can move to an absolute position
-x.moveabs(4.0563)
+x.move_abs(4.0563)
 x.pos
 >>> 4.0562567
 
 # or make a relative adjustment
-x.moverel(1)
+x.move_rel(1)
 x.pos
 >>> 5.0562552
+
+# the velocity setpoint can be adjusted
+x.velocity(10) # mm/s
+x.velocity()
+>>> 10 # and queried
+
+# the software limits can be queried
+x.limits
+>>> {'min': 0, 'max': 210}
 
 # the axis can be homed
 x.home()
@@ -84,6 +93,14 @@ aerotechGetPos(s)
 aerotechGetEnabled(s)
 >>> 1
 aerotechSetEnabled(s, 0) % 0 == logical false == disable, 1 to enable
+
+% velocity setpoints
+aerotechSetVelocity(s, 10)
+aerotechGetVelocity(s)
+>>> 10
+
+% limits
+aerotechGetLimits
 ```
 
 ## There was an error
