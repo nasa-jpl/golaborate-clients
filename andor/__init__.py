@@ -320,6 +320,31 @@ class Camera:
             resp = requests.post(url, json=dict_)
             raise_err(resp)
 
+    def binning(self, fctr=None):
+        """Get or set the on-camera binning.
+
+        Parameters
+        ----------
+        fctr : `int`
+            binning to apply, symmetric in H and V.
+
+        Returns
+        -------
+        `int`
+            the binning
+
+        """
+        url = f'{self.addr}/binning'
+        if fctr is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()['h'] # keys are h,v but we are explicitly symmetric
+
+        else:
+            payload = {'h': fctr, 'v': fctr}
+            resp = requests.post(url, json=payload)
+            raise_err(resp)
+
     # thermal
     def fan(self, on=None):
         """Turns the fan on or off (on != None), or checks if it's on (true).
