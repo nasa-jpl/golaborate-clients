@@ -338,7 +338,7 @@ class Camera:
         if fctr is None:
             resp = requests.get(url)
             raise_err(resp)
-            return resp.json()['h'] # keys are h,v but we are explicitly symmetric
+            return resp.json()['h']  # keys are h,v but we are explicitly symmetric
 
         else:
             payload = {'h': fctr, 'v': fctr}
@@ -534,6 +534,40 @@ class Camera:
             return hdu[0].data
         else:
             return hdu
+
+    def burst(self, frames, fps, serverSpool=0):
+        """Take a burst of images, returned as a generator of 2D arrays.
+
+        Parameters
+        ----------
+        `frames` : `int`
+            number of frames to take in the sequence
+        `fps` : `float`
+            framerate to use.  Ensure it is supported by the camera
+        serverSpool : `int`
+            size of the spool (in frames) to use on the server to buffer,
+            if the client can't keep up.  If Zero, the spool size is set to
+            frames*fps, which may cause out of memory errors.
+
+        Returns
+        -------
+        `generator`
+            a generator yielding 2D ndarrays.  An exception may be raised while
+            iterating it if one is encountered on the server.
+
+        """
+        payload = {
+            'fps': fps,
+            'frames': frames,
+            'spool': serverSpool
+        }
+        resp = requests.post(f'{self.addr}/burst/setup', json=payload)
+        raise_err(resp)
+        for _ in range(frames):
+            resp = requests.get(f'{self.addr}/burst/frame')
+            raise_err(resp)
+            hdu = fits.open(BytesIO(resp.content))
+            yield hdu[0].data
 
     # this is EMCCD stuff
     def em_gain(self, fctr=None):
