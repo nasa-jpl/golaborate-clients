@@ -8,7 +8,8 @@ function ary = andorGetBurst(s, frames, fps)
     s2.frames = frames;
 
     webwrite(strcat(s.CameraURL, '/burst/setup'), s2, writeopts);
-    ary = [];
+    AOI = andorGetAOI(s);
+    ary = zeros(AOI.height, AOI.width, frames);
 
     for i = 1:frames
         websave('dummy.fits', strcat(s.CameraURL, '/burst/frame'), 'fmt', 'fits', opts);
