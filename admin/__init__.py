@@ -19,6 +19,7 @@ def raise_err(resp):
     if resp.status_code != 200:
         raise Exception(resp.content.decode('UTF-8').rstrip())
 
+
 def lock(address_holder):
     """Lock a resource.
 
@@ -32,6 +33,7 @@ def lock(address_holder):
     resp = requests.post(f'{address_holder.addr}/lock', json={'bool': True})
     raise_err(resp)
     return
+
 
 def lock(address_holder):
     """Lock a resource.
