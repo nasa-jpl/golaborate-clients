@@ -63,7 +63,7 @@ class Chiller:
             the current setpoint in degrees celcius
 
         """
-        url = f'{self.addr}/setpoint'
+        url = f'{self.addr}/temperature-setpoint'
         if celcius is None:
             resp = requests.get(url)
             raise_err(resp)
@@ -75,10 +75,12 @@ class Chiller:
 
     @property
     def faults(self):
-        resp = requests.get(f'{self.addr}/temperature')
+        """Faults displayed by the thermocube."""
+        resp = requests.get(f'{self.addr}/faults')
         raise_err(resp)
         return resp.json()
 
     @property
     def tank_level_low(self):
+        """If True, the tank needs to be refilled."""
         return self.faults['tankLevelLow']
