@@ -1,6 +1,6 @@
-# Aerotech (http) clients
+# Motion (http) clients
 
-This repository contains clients for Aerotech motion controllers in various languages.  To adapt the examples to your own testbed, just know the IP or name of the server you have a multiserver from `go-hcit` running at.
+This repository contains clients for motion controllers in various languages.  To adapt the examples to your own testbed, just know the IP or name of the server you have a multiserver from `go-hcit` running at.  Aerotech Ensemble, Newport XPS, and newport ESP controllers are supported.
 
 Point of contact: [Brandon Dube (383D)](mailto:brandon.dube@jpl.nasa.gov)
 
@@ -8,19 +8,19 @@ Point of contact: [Brandon Dube (383D)](mailto:brandon.dube@jpl.nasa.gov)
 
 To install:
 ```sh
-pip install git+https://github.jpl.nasa.gov/HCIT/client-aerotech
+pip install git+https://github.jpl.nasa.gov/HCIT/client-motion
 ```
 
 To use:
 
 ```python
-import aerotech
+import motion
 
 # ctl = "controller"
-ctl = aerotech.Ensemble("malady:8002")
+ctl = motion.Controller("malady:8002")
 
 # some parameters are using defaults, this is equivalent:
-ctl = aerotech.Ensemble("malady:8002", ['X', 'Y', 'Z'])
+ctl = motion.Controller("malady:8002", ['X', 'Y', 'Z'])
 
 # ctl has a property for each axis,
 x, y, z = ctl.X, ctl.Y, ctl.Z
@@ -71,36 +71,36 @@ s.ControllerURL = 'http://malady:8002'
 s.Axis = 'X'
 
 % get the position
-aerotechGetPos(s)
+motionGetPos(s)
 >>> 3.9
 
 % absolute move, mm
-aerotechMoveAbs(s, 5)
-aerotechGetPos(s)
+motionMoveAbs(s, 5)
+motionGetPos(s)
 >>> 5
 
 % relative move, mm
-aerotechMoveRel(s, 1)
-aerotechGetPos(s)
+motionMoveRel(s, 1)
+motionGetPos(s)
 >>> 6
 
 % home
-aerotechHome(s)
-aerotechGetPos(s)
+motionHome(s)
+motionGetPos(s)
 >>> 0
 
 % enable/disable
-aerotechGetEnabled(s)
+motionGetEnabled(s)
 >>> 1
-aerotechSetEnabled(s, 0) % 0 == logical false == disable, 1 to enable
+motionSetEnabled(s, 0) % 0 == logical false == disable, 1 to enable
 
 % velocity setpoints
-aerotechSetVelocity(s, 10)
-aerotechGetVelocity(s)
+motionSetVelocity(s, 10)
+motionGetVelocity(s)
 >>> 10
 
 % limits
-aerotechGetLimits
+motionGetLimits
 ```
 
 ## There was an error

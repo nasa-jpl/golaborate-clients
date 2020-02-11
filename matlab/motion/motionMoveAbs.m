@@ -1,4 +1,4 @@
-function aerotechMoveAbs(s, pos)
+function motionMoveAbs(s, pos)
     url = strcat(s.ControllerURL, "/axis/", s.Axis, "/pos");
     opts = weboptions('MediaType', 'application/json', 'timeout', 60);
     payload = struct();

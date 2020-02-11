@@ -1,4 +1,4 @@
-"""HTTP client library for Aerotech motion control based on go-hcit."""
+"""HTTP client library for motion control based on go-hcit."""
 
 try:
     from setuptools import setup

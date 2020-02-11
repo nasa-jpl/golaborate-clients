@@ -1,4 +1,4 @@
-function aerotechSetEnabled(s, bool)
+function motionSetEnabled(s, bool)
     url = strcat(s.ControllerURL, "/axis/", s.Axis, "enabled");
     opts = weboptions('MediaType', 'application/json');
     payload = struct();

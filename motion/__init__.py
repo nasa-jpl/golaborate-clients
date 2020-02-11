@@ -1,4 +1,4 @@
-"""Aerotech enables nice control of Aerotech Ensemble controllers (and stages) over HTTP via a go-hcit server."""
+"""motion enables nice control of motion controllers (and stages) over HTTP via a go-hcit server."""
 
 import requests
 
@@ -33,7 +33,7 @@ def _niceaddr(addr):
 
 
 class Axis:
-    """Axis represnets an axis of an aerotech stage."""
+    """Axis represents an axis of a stage."""
 
     def __init__(self, addr, name):
         """Create a new Axis instance.
@@ -41,7 +41,7 @@ class Axis:
         Parameters
         ----------
         addr : `str`
-            "root" address of the go-hcit aerotech server.
+            "root" address of the go-hcit motion server.
         name : `str`
             name of the axis, as the controller knows it
 
@@ -151,16 +151,16 @@ class Axis:
         raise_err(resp)
 
 
-class Ensemble:
-    """Ensemble represents an Ensemble motion controller."""
+class Controller:
+    """Controller represents a motion controller."""
 
     def __init__(self, addr, axes=['X', 'Y', 'Z']):
-        """Create a new Ensemble instance.
+        """Create a new EnsembleController instance.
 
         Parameters
         ----------
         addr : `str`
-            "root" address of the go-hcit aerotech server.
+            "root" address of the go-hcit motion server.
 
         """
         self.addr = _niceaddr(addr)

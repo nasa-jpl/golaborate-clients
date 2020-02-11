@@ -1,4 +1,4 @@
-function aerotechMoveRel(s, delta)
+function motionMoveRel(s, delta)
     url = strcat(s.ControllerURL, "/axis/", s.Axis, "/pos?relative=true");
     opts = weboptions('MediaType', 'application/json');
     payload = struct();

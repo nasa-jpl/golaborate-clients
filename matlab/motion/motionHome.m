@@ -1,4 +1,4 @@
-function aerotechHome(s)
+function motionHome(s)
     url = strcat(s.ControllerURL, "/axis/", s.Axis, "/home");
     dummy = struct(); % need this to satisfy matlab
     opts = weboptions('timeout', 60);
