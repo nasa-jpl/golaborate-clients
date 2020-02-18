@@ -122,12 +122,6 @@ class Axis:
             resp = requests.post(url, json=payload)
             raise_err(resp)
 
-    @property
-    def limits(self):
-        """Server/software imposed travel limits."""
-        resp = requests.get(f'{self.addr}/axis/{self.name}/limits')
-        return resp.json()
-
     def move_abs(self, pos):
         """Move the axis to an absolute position.
 
