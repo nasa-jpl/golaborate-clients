@@ -1,4 +1,4 @@
-function f64 = motionGetPos(s)
+function f64 = motionGetVelocity(s)
     url = strcat(s.ControllerURL, "/axis/", s.Axis, "/velocity");
     resp = webread(url);
     f64 = resp.f64;
