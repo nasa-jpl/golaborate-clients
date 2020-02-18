@@ -69,6 +69,12 @@ class Axis:
         resp = requests.post(url, json=payload)
         raise_err(resp)
 
+    def initialize(self):
+        """Initialize the axis."""
+        url = f'{self.addr}/axis/{self.name}/initialize'
+        resp = requests.post(url)
+        raise_err(resp)
+
     @property
     def enabled(self):
         """Boolean for if the axis is enabled."""
