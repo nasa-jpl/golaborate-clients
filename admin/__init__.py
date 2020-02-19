@@ -35,7 +35,7 @@ def lock(address_holder):
     return
 
 
-def lock(address_holder):
+def unlock(address_holder):
     """Lock a resource.
 
     Parameters
