@@ -1,5 +1,5 @@
-function andorSetBinnign(s, fctr)
-%andorSetExposureTime(s, tSec)
+function andorSetBinning(s, fctr)
+%andorSetBinning(s, tSec)
 %   Sets the binning to (fctr x fctr) pixels
 
     s2 = struct();
