@@ -157,7 +157,7 @@ class FunctionGenerator:
             if the generator is currently outputting
 
         """
-        url = f'{self.addr}/on'
+        url = f'{self.addr}/output'
         if on is None:
             resp = requests.get(url)
             raise_err(resp)
