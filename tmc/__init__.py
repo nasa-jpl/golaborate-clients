@@ -92,7 +92,7 @@ class FunctionGenerator:
             raise_err(resp)
             return resp.json()['f64']
 
-        resp = requests.post(url, json={'f64': float64(volts)})
+        resp = requests.post(url, json={'f64': float(volts)})
         raise_err(resp)
         return
 
@@ -117,7 +117,7 @@ class FunctionGenerator:
             raise_err(resp)
             return resp.json()['f64']
 
-        resp = requests.post(url, json={'f64': float64(hertz)})
+        resp = requests.post(url, json={'f64': float(hertz)})
         raise_err(resp)
         return
 
@@ -142,7 +142,7 @@ class FunctionGenerator:
             raise_err(resp)
             return resp.json()['f64']
 
-        resp = requests.post(url, json={'f64': float64(volts)})
+        resp = requests.post(url, json={'f64': float(volts)})
         raise_err(resp)
         return
 
@@ -408,7 +408,7 @@ class DAQ:
             the label to use
 
         """
-        url = f'{self.addr}/label'
+        url = f'{self.addr}/channel-label'
         payload = {'channel': int(channel), 'label': label}
         resp = requests.post(url, json=payload)
         raise_err(resp)
@@ -481,14 +481,14 @@ class DAQ:
         if channel is None:
             resp = requests.get(url)
             raise_err(resp)
-            return reps.json()['int']
+            return resp.json()['int']
         else:
             payload = {'int': int(channel)}
             resp = requests.post(url, json=payload)
             raise_err(resp)
             return
 
-    def recording_length(self, samples):
+    def recording_length(self, samples=None):
         """Get or set the length of a recording in samples.
 
         Parameters
