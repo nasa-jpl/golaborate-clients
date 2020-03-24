@@ -432,17 +432,11 @@ class DAQ:
         if isinstance(channels, int):
             channels = [channels]
 
-        url = f'{self.addr}/configure'
-        payload = {
-            'channels': channels,
-            'measurement': measurement,
-            'range': float(range_),
-            'resolution': float(resolution),
-            'dc': dc,
-        }
-        resp = requests.post(url, json=payload)
-        raise_err(resp)
-        return
+        channels = ','.join((str(e) for e in channels))
+        string = f'*CLS;:CONF:{measurement.upper()}:{"DC" if dc else "AC"} {range_},{resolution}, (@{channels});:SYST:ERROR?'
+        resp = self.raw(string)
+        if not resp[:2] == "+0":
+            raise Exception(resp)
 
     def sample_rate(self, samples_per_second=None):
         """Configure the sampling (scan) rate of the DAQ.
@@ -462,9 +456,9 @@ class DAQ:
         if samples_per_second is None:
             resp = requests.get(url)
             raise_err(resp)
-            return resp.json()['int']
+            return resp.json()['f64']
         else:
-            payload = {'int': int(samples_per_second)}
+            payload = {'f64': float(samples_per_second)}
             resp = requests.post(url, json=payload)
             raise_err(resp)
             return
@@ -526,3 +520,10 @@ class DAQ:
         raise_err(resp)
         src = io.BytesIO(resp.content)
         return np.loadtxt(src, delimiter=',', skiprows=1)
+
+    def raw(self, cmd):
+        """Raw sends text to the device and returns any response."""
+        url = f'{self.addr}/raw'
+        resp = requests.post(url, json={'str': cmd})
+        raise_err(resp)
+        return resp.json()['str']
