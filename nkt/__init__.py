@@ -70,7 +70,7 @@ class SuperK:
             json = resp.json()
             return json['center'], json['bandwidth']
         else:
-            data = {'center': center, 'bandwidth': bw}
+            data = {'center': float(center), 'bandwidth': float(bw)}
             resp = requests.post(url, json=data)
             raise_err(resp)
 
@@ -146,7 +146,7 @@ class SuperK:
             raise_err(resp)
             return resp.json()['bool']
         else:
-            payload = {'bool': on}
+            payload = {'bool': bool(on)}
             resp = requests.post(url, json=payload)
             raise_err(resp)
 
@@ -170,7 +170,7 @@ class SuperK:
             raise_err(resp)
             return resp.json()['f64']
         else:
-            payload = {'f64': pct}
+            payload = {'f64': float(pct)}
             resp = requests.post(url, json=payload)
             raise_err(resp)
 
@@ -194,7 +194,7 @@ class SuperK:
             raise_err(resp)
             return resp.json()['f64']
         else:
-            payload = {'f64': pct}
+            payload = {'f64': float(pct)}
             resp = requests.post(url, json=payload)
             raise_err(resp)
 
