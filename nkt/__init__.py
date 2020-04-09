@@ -2,6 +2,7 @@
 
 import requests
 
+
 def raise_err(resp):
     """Raise an exception if the response status code is not 200.
 
@@ -13,7 +14,7 @@ def raise_err(resp):
     Raises
     ------
     Exception
-    any errors encountered, whether they are in communciation with the
+    any errors encountered, whether they are in communication with the
     server or between the server and the camera/SDK
 
     """
@@ -150,7 +151,7 @@ class SuperK:
             resp = requests.post(url, json=payload)
             raise_err(resp)
 
-    def ND(self, pct=None):
+    def ND(self, pct=None):  # NOQA
         """Get or set the VARIA ND strength.
 
         Parameters
@@ -200,14 +201,14 @@ class SuperK:
 
     def status_main(self):
         """Get the status bitfield from the main module."""
-        url = self.ip + "/main-module-status"
+        url = f'{self.addr}/main-module-status'
         resp = requests.get(url)
         raise_err(resp)
         return resp.json()
 
     def status_varia(self):
         """Get the status bitfield from the VARIA module."""
-        url = self.ip + "/varia-status"
+        url = f'{self.addr}/varia-status'
         resp = requests.get(url)
         raise_err(resp)
         return resp.json()
