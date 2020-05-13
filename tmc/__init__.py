@@ -171,6 +171,28 @@ class FunctionGenerator:
         raise_err(resp)
         return
 
+    def upload_arb(self, ary):
+        """Upload an arbitrary waveform to the the function generator.
+
+        While the data is 16 bit, it must not be too large for the DAC on
+        the hardware.  For 12-bit data, this means not exceeding 4095
+
+        Parameters
+        ----------
+        ary : `numpy.ndarray`
+            ndarray with ndim == 1, dtype == uint16
+            for the Agilent 33250A, len < 65535 as well
+
+        """
+        if ary.ndim != 1:
+            raise ValueError("array must be of dimension 1")
+        if ary.dtype != np.uint16:
+            raise ValueError("array must be of dtype uint16")
+
+        url = f'{self.addr}/waveform'
+        resp = requests.post(url, ary.tobytes())
+        raise_err(resp)
+
     def raw(self, cmd):
         """Raw sends text to the device and returns any response."""
         url = f'{self.addr}/raw'
@@ -205,6 +227,8 @@ class Oscilloscope:
 
         Parameters
         ----------
+        channel : `str`
+            which channel to set the scale for
         volts_full_scale : `float`
             number of volts full scale on the scope screen
 
@@ -344,7 +368,7 @@ class Oscilloscope:
         raise_err(resp)
         return
 
-    def acq_waveform(self, channels=['1', '2', '3', '4']):
+    def acq_waveform(self, channels=('1', '2', '3', '4')):
         """Acquire a waveform from the scope.
 
         Parameters
@@ -421,8 +445,10 @@ class DAQ:
         ----------
         measurement : `str`, {'volt', 'curr'}
             voltage or current
-        range : `float`
+        range_ : `float`
             symmetric range to digitize over
+        resolution : `float`
+            resolution to digitize with
         channels : `iterable` of `int`
             list of channels to configure.  Accepts single int, too.
         dc : `bool`
@@ -433,7 +459,7 @@ class DAQ:
             channels = [channels]
 
         channels = ','.join((str(e) for e in channels))
-        string = f'*CLS;:CONF:{measurement.upper()}:{"DC" if dc else "AC"} {range_},{resolution}, (@{channels});:SYST:ERROR?'
+        string = f'*CLS;:CONF:{measurement.upper()}:{"DC" if dc else "AC"} {range_},{resolution}, (@{channels});:SYST:ERROR?'  # NOQA
         resp = self.raw(string)
         if not resp[:2] == "+0":
             raise Exception(resp)
@@ -493,8 +519,8 @@ class DAQ:
 
         Parameters
         ----------
-        channel : `int`
-            which channel to use
+        samples : `int`
+            how many samples are in the record
 
         Returns
         -------
