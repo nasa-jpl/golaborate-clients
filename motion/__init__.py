@@ -2,34 +2,9 @@
 
 import requests
 
+from retry import retry
 
-def raise_err(resp):
-    """Raise an exception if the response status code is not 200.
-
-    Parameters
-    ----------
-    resp : `requests.Response`
-        a response with a status code
-
-    Raises
-    ------
-    Exception
-    any errors encountered, whether they are in communciation with the
-    server or between the server and the camera/SDK
-
-    """
-    if resp.status_code != 200:
-        raise Exception(resp.content.decode('UTF-8').rstrip())
-
-
-def _niceaddr(addr):
-    if not addr.startswith('http://'):
-        addr = 'http://' + addr
-
-    if 'https' in addr:
-        addr = addr.replace('https', 'http')
-
-    return addr
+from golab_common import niceaddr, raise_err
 
 
 class Axis:
@@ -46,15 +21,17 @@ class Axis:
             name of the axis, as the controller knows it
 
         """
-        self.addr = _niceaddr(addr)
+        self.addr = niceaddr(addr)
         self.name = name
 
+    @retry(max_retries=2, interval=1)
     def home(self):
         """Home the axis."""
         url = f'{self.addr}/axis/{self.name}/home'
         resp = requests.post(url)
         raise_err(resp)
 
+    @retry(max_retries=2, interval=1)
     def enable(self):
         """Enable the axis."""
         url = f'{self.addr}/axis/{self.name}/enabled'
@@ -62,6 +39,7 @@ class Axis:
         resp = requests.post(url, json=payload)
         raise_err(resp)
 
+    @retry(max_retries=2, interval=1)
     def disable(self):
         """Disable the axis."""
         url = f'{self.addr}/axis/{self.name}/enabled'
@@ -69,6 +47,7 @@ class Axis:
         resp = requests.post(url, json=payload)
         raise_err(resp)
 
+    @retry(max_retries=2, interval=1)
     def initialize(self):
         """Initialize the axis."""
         url = f'{self.addr}/axis/{self.name}/initialize'
@@ -76,6 +55,7 @@ class Axis:
         raise_err(resp)
 
     @property
+    @retry(max_retries=2, interval=1)
     def enabled(self):
         """Boolean for if the axis is enabled."""
         url = f'{self.addr}/axis/{self.name}/enabled'
@@ -84,6 +64,7 @@ class Axis:
         return resp.json()['bool']
 
     @property
+    @retry(max_retries=2, interval=1)
     def pos(self):
         """Position of the axis."""
         url = f'{self.addr}/axis/{self.name}/pos'
@@ -92,12 +73,14 @@ class Axis:
         return resp.json()['f64']
 
     @property
+    @retry(max_retries=2, interval=1)
     def limits(self):
         """Limits of the axis."""
         resp = requests.get(f'{self.addr}/axis/{self.name}/limits')
         raise_err(resp)
         return resp.json()
 
+    @retry(max_retries=2, interval=1)
     def velocity(self, value=None):
         """Velocity setpoint of the axis.
 
@@ -122,6 +105,7 @@ class Axis:
             resp = requests.post(url, json=payload)
             raise_err(resp)
 
+    @retry(max_retries=2, interval=1)
     def move_abs(self, pos):
         """Move the axis to an absolute position.
 
@@ -136,6 +120,7 @@ class Axis:
         resp = requests.post(url, json=payload)
         raise_err(resp)
 
+    @retry(max_retries=2, interval=1)
     def move_rel(self, pos):
         """Move the axis by a relative amount.
 
@@ -163,7 +148,7 @@ class Controller:
             "root" address of the go-hcit motion server.
 
         """
-        self.addr = _niceaddr(addr)
+        self.addr = niceaddr(addr)
         for axis in axes:
             ax = Axis(self.addr, axis)
             setattr(self, axis, ax)

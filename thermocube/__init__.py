@@ -1,24 +1,9 @@
 """thermocube provides tools for accessing thermocube chillers thanks to a go-hcit middleman."""
 import requests
 
+from retry import retry
 
-def raise_err(resp):
-    """Raise an exception if the response status code is not 200.
-
-    Parameters
-    ----------
-    resp : `requests.Response`
-        a response with a status code
-
-    Raises
-    ------
-    Exception
-    any errors encountered, whether they are in communciation with the
-    server or between the server and the camera/SDK
-
-    """
-    if resp.status_code != 200:
-        raise Exception(resp.content.decode('UTF-8').rstrip())
+from golab_common import raise_err, niceaddr
 
 
 class Chiller:
@@ -34,21 +19,17 @@ class Chiller:
             HTTP prefix not needed.
 
         """
-        if not addr.startswith('http://'):
-            addr = 'http://' + addr
-
-        if 'https' in addr:
-            addr = addr.replace('https', 'http')
-
-        self.addr = addr
+        self.addr = niceaddr(addr)
 
     @property
+    @retry(max_retries=2, interval=1)
     def temperature(self):
         """Temperature at the output of the cube."""
         resp = requests.get(f'{self.addr}/temperature')
         raise_err(resp)
         return resp.json()['f64']
 
+    @retry(max_retries=2, interval=1)
     def temperature_setpoint(self, celcius=None):
         """Get (celcius=None) or set (celcius != None) the temperature setpoint.
 
@@ -74,12 +55,14 @@ class Chiller:
             raise_err(resp)
 
     @property
+    @retry(max_retries=2, interval=1)
     def faults(self):
         """Faults displayed by the thermocube."""
         resp = requests.get(f'{self.addr}/faults')
         raise_err(resp)
         return resp.json()
 
+    # no need to decorate this since the inner function is decorated
     @property
     def tank_level_low(self):
         """If True, the tank needs to be refilled."""

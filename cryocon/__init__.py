@@ -1,24 +1,11 @@
 """cryocon expresses reading of Cryocon Model 12~18i+ monitors over HTTP."""
 import requests
 
+from golab_common import raise_err
 
-def raise_err(resp):
-    """Raises an exception if the response status code is not 200.
+from retry import retry
 
-    Parameters
-    ----------
-    resp : `requests.Response`
-        a response with a status code
-
-    Raises
-    ------
-    Exception
-    any errors encountered, whether they are in communciation with the
-    server or between the server and the camera/SDK
-
-    """
-    if resp.status_code != 200:
-        raise Exception(str(resp.content).strip())
+ABS_ZERO = -273.15
 
 
 class TemperatureMonitor:
@@ -43,12 +30,14 @@ class TemperatureMonitor:
         self.addr = addr
 
     @property
+    @retry(max_retries=2, interval=1)
     def version(self):
         """The model name and firmware version."""
         resp = requests.get(self.addr + "/version")
         raise_err(resp)
         return str(resp.content).rstrip()
 
+    @retry(max_retries=2, interval=1)
     def read(self, ch='all'):
         """Read some or all of the channels.
 
@@ -67,8 +56,14 @@ class TemperatureMonitor:
         if ch == 'ALL':
             resp = requests.get(self.addr + "/read")
             raise_err(resp)
-            return resp.json()
+            ret = resp.json()  # ret is a list or something
+            # NaN can't be JSON'd and is encoded as -274
+            return [f if f < ABS_ZERO else float('nan') for f in ret]
         else:
             resp = requests.get(f'{self.addr}/read/{ch}')
             raise_err(resp)
-            return resp.json()['f64']
+            ret = resp.json()['f64']
+            if ret < ABS_ZERO:
+                ret = float('nan')
+
+            return ret

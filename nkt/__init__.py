@@ -2,24 +2,9 @@
 
 import requests
 
+from retry import retry
 
-def raise_err(resp):
-    """Raise an exception if the response status code is not 200.
-
-    Parameters
-    ----------
-    resp : `requests.Response`
-        a response with a status code
-
-    Raises
-    ------
-    Exception
-    any errors encountered, whether they are in communication with the
-    server or between the server and the camera/SDK
-
-    """
-    if resp.status_code != 200:
-        raise Exception(resp.content.decode('UTF-8').rstrip())
+from golab_common import raise_err, niceaddr
 
 
 class SuperK:
@@ -34,14 +19,9 @@ class SuperK:
             IP address (port included) that the HTTP adapter server is listening at
 
         """
-        if not addr.startswith('http://'):
-            addr = 'http://' + addr
+        self.addr = niceaddr(addr)
 
-        if 'https' in addr:
-            addr = addr.replace('https', 'http')
-
-        self.addr = addr
-
+    @retry(max_retries=2, interval=1)
     def center_bandwidth(self, center=None, bw=None):
         """Get or set the center wavelength and full bandwidth.
 
@@ -75,6 +55,7 @@ class SuperK:
             resp = requests.post(url, json=data)
             raise_err(resp)
 
+    @retry(max_retries=2, interval=1)
     def short_wave(self, wvl_nm=None):
         """Get or set the short wavelength of the VARIA.
 
@@ -99,6 +80,7 @@ class SuperK:
             resp = requests.post(url, json=payload)
             raise_err(resp)
 
+    @retry(max_retries=2, interval=1)
     def long_wave(self, wvl_nm=None):
         """Get or set the long wavelength of the VARIA.
 
@@ -123,6 +105,7 @@ class SuperK:
             resp = requests.post(url, json=payload)
             raise_err(resp)
 
+    @retry(max_retries=2, interval=1)
     def emission(self, on=None):
         """Get or set the emission.
 
@@ -151,6 +134,7 @@ class SuperK:
             resp = requests.post(url, json=payload)
             raise_err(resp)
 
+    @retry(max_retries=2, interval=1)
     def ND(self, pct=None):  # NOQA
         """Get or set the VARIA ND strength.
 
@@ -175,6 +159,7 @@ class SuperK:
             resp = requests.post(url, json=payload)
             raise_err(resp)
 
+    @retry(max_retries=2, interval=1)
     def power(self, pct=None):
         """Get or set the main module power level.
 
@@ -199,6 +184,7 @@ class SuperK:
             resp = requests.post(url, json=payload)
             raise_err(resp)
 
+    @retry(max_retries=2, interval=1)
     def status_main(self):
         """Get the status bitfield from the main module."""
         url = f'{self.addr}/main-module-status'
@@ -206,6 +192,7 @@ class SuperK:
         raise_err(resp)
         return resp.json()
 
+    @retry(max_retries=2, interval=1)
     def status_varia(self):
         """Get the status bitfield from the VARIA module."""
         url = f'{self.addr}/varia-status'

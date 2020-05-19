@@ -1,24 +1,9 @@
 """Fluke provides tools for accessing Fluke hardware thanks to a go-hcit middleman."""
 import requests
 
+from retry import retry
 
-def raise_err(resp):
-    """Raise an exception if the response status code is not 200.
-
-    Parameters
-    ----------
-    resp : `requests.Response`
-        a response with a status code
-
-    Raises
-    ------
-    Exception
-    any errors encountered, whether they are in communciation with the
-    server or between the server and the camera/SDK
-
-    """
-    if resp.status_code != 200:
-        raise Exception(resp.content.decode('UTF-8').rstrip())
+from golab_common import raise_err, niceaddr
 
 
 class DewK:
@@ -34,15 +19,10 @@ class DewK:
             HTTP prefix not needed.
 
         """
-        if not addr.startswith('http://'):
-            addr = 'http://' + addr
-
-        if 'https' in addr:
-            addr = addr.replace('https', 'http')
-
-        self.addr = addr
+        self.addr = niceaddr(addr)
 
     @property
+    @retry(max_retries=2, interval=1)
     def reading(self):
         """Instantaneous Temp/Humidity reading."""
         url = f'{self.addr}/read'

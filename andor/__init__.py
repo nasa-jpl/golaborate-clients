@@ -20,24 +20,7 @@ except ImportError:
 
 import requests
 
-
-def raise_err(resp):
-    """Raise an exception if the response status code is not 200.
-
-    Parameters
-    ----------
-    resp : `requests.Response`
-        a response with a status code
-
-    Raises
-    ------
-    Exception
-    any errors encountered, whether they are in communciation with the
-    server or between the server and the camera/SDK
-
-    """
-    if resp.status_code != 200:
-        raise Exception(resp.content.decode('UTF-8').rstrip())
+from golab_common import raise_err, niceaddr
 
 
 def proces_exposure_time(t):
@@ -177,20 +160,14 @@ class Camera:
             astropy (exposure time returns as astropy quantity)
 
         """
-        if not addr.startswith('http://'):
-            addr = 'http://' + addr
-
-        if 'https' in addr:
-            addr = addr.replace('https', 'http')
-
-        self.addr = addr
+        self.addr = niceaddr(addr)
         self.time_convention = time_convention
         self.recorder = Recorder(addr)
 
     # generics
     @property
     def features(self):
-        """A dictionary mapping feature names to strings representing their types."""
+        """Dictionary mapping feature names to strings representing their types."""
         resp = requests.get(self.addr + "/feature")
         raise_err(resp)
         return resp.json()
@@ -347,7 +324,7 @@ class Camera:
 
     # thermal
     def fan(self, on=None):
-        """Turns the fan on or off (on != None), or checks if it's on (true).
+        """Turn the fan on or off (on != None), or checks if it's on (true).
 
         Parameters
         ----------
@@ -395,7 +372,7 @@ class Camera:
 
     @property
     def temperature(self):
-        """The current sensor temperature in Celcius."""
+        """Current sensor temperature in Celcius."""
         resp = requests.get(self.addr + "/temperature")
         raise_err(resp)
         return resp.json()['f64']
@@ -433,14 +410,14 @@ class Camera:
 
     @property
     def temperature_setpt_options(self):
-        """The currently allowed temperature setpoint options."""
+        """Currently allowed temperature setpoint options."""
         resp = requests.get(self.addr + '/temperature-setpoint-options')
         raise_err(resp)
         return resp.json()
 
     @property
     def cooling_status(self):
-        """The current cooling status."""
+        """Current cooling status."""
         resp = requests.get(self.addr + "/temperature-status")
         raise_err(resp)
         return resp.json()['str']
@@ -495,45 +472,6 @@ class Camera:
                 return hdu
         else:
             return imread(resp.content, format=fmt)
-
-    def snap2(self, exposure_time=None, ret='array'):
-        """Snap, but with logic to handle automatic image rotation.
-
-        Parameters
-        ----------
-        exposure_time : `str`, `numbers.Number`, or `astropy.units.Quantity`
-            something process_exposure_time can turn into the format expected
-            by the server.  See help(andor.process_exposure_time).
-        fmt : `str`, {'fits', 'jpg', 'png'}, optional
-            the format to retrieve the image as.
-            If fits, the ret parameter is used, otherwise it is ignored.
-            Fit images are captured with 16-bit precision, other options are 8-bit.
-        ret : `str`, {'array', 'hdu', 'file'}, optional
-            If array, returns a numpy array
-            If hdu, returns an astropy.io.fits.HDU object.  The user is
-            responsible for closing it when finished.
-
-        Returns
-        -------
-        `numpy.ndarray` or `astropy.io.fits.HDU`
-            either an array holding the image data as uint8 or uint16,
-            or an HDU object. Users must close the HDU object.
-
-        """
-        hdu = self.snap(exposure_time, ret='hdu')
-        try:
-            orientation = hdu[0].header['ORIENT']
-        except KeyError:
-            orientation = 90
-
-        k = orientation // 90
-        if k != 0:
-            hdu[0].data = np.rot90(hdu[0].data, k)
-
-        if ret == 'array':
-            return hdu[0].data
-        else:
-            return hdu
 
     def burst(self, frames, fps, serverSpool=0):
         """Take a burst of images, returned as a generator of 2D arrays.
@@ -618,7 +556,7 @@ class Camera:
 
     @property
     def em_gain_range(self):
-        """The min and max values for EM gain in the current configuration."""
+        """Min and max values for EM gain in the current configuration."""
         resp = requests.get(f'{self.addr}/em-gain-range')
         raise_err(resp)
         return resp.json()

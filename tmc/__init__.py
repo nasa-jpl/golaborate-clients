@@ -5,24 +5,9 @@ import requests
 
 import numpy as np
 
+from retry import retry
 
-def raise_err(resp):
-    """Raise an exception if the response status code is not 200.
-
-    Parameters
-    ----------
-    resp : `requests.Response`
-        a response with a status code
-
-    Raises
-    ------
-    Exception
-    any errors encountered, whether they are in communciation with the
-    server or between the server and the camera/SDK
-
-    """
-    if resp.status_code != 200:
-        raise Exception(resp.content.decode('UTF-8').rstrip())
+from golab_common import raise_err
 
 
 class FunctionGenerator:
@@ -46,6 +31,7 @@ class FunctionGenerator:
 
         self.addr = addr
 
+    @retry(max_retries=2, interval=1)
     def function(self, signal_type=None):
         """Get or set the function type used by the generator.
 
@@ -71,6 +57,7 @@ class FunctionGenerator:
         raise_err(resp)
         return
 
+    @retry(max_retries=2, interval=1)
     def voltage(self, volts=None):
         """Get or set the voltage used by the generator, Vpp.
 
@@ -96,6 +83,7 @@ class FunctionGenerator:
         raise_err(resp)
         return
 
+    @retry(max_retries=2, interval=1)
     def frequency(self, hertz=None):
         """Get or set the frequency used by the generator, Hz.
 
@@ -121,6 +109,7 @@ class FunctionGenerator:
         raise_err(resp)
         return
 
+    @retry(max_retries=2, interval=1)
     def offset(self, volts=None):
         """Get or set the offset used by the generator, Volts.
 
@@ -146,6 +135,7 @@ class FunctionGenerator:
         raise_err(resp)
         return
 
+    @retry(max_retries=2, interval=1)
     def output(self, on=None):
         """Get or set the output state, on=True -> output on.
 
@@ -171,6 +161,7 @@ class FunctionGenerator:
         raise_err(resp)
         return
 
+    @retry(max_retries=2, interval=1)
     def upload_arb(self, ary):
         """Upload an arbitrary waveform to the the function generator.
 
@@ -421,6 +412,7 @@ class DAQ:
 
         self.addr = addr
 
+    @retry(max_retries=2, interval=1)
     def label(self, channel, label):
         """Set the label for a given channel.
 
@@ -438,6 +430,7 @@ class DAQ:
         raise_err(resp)
         return
 
+    @retry(max_retries=2, interval=1)
     def configure(self, measurement, range_, resolution, channels, dc=True):
         """Configure the selected channel(s).
 
@@ -464,6 +457,7 @@ class DAQ:
         if not resp[:2] == "+0":
             raise Exception(resp)
 
+    @retry(max_retries=2, interval=1)
     def sample_rate(self, samples_per_second=None):
         """Configure the sampling (scan) rate of the DAQ.
 
@@ -489,6 +483,7 @@ class DAQ:
             raise_err(resp)
             return
 
+    @retry(max_retries=2, interval=1)
     def recording_channel(self, channel=None):
         """Get or set the channel used in recording.
 
@@ -514,6 +509,7 @@ class DAQ:
             raise_err(resp)
             return
 
+    @retry(max_retries=2, interval=1)
     def recording_length(self, samples=None):
         """Get or set the length of a recording in samples.
 
@@ -539,6 +535,7 @@ class DAQ:
             raise_err(resp)
             return
 
+    @retry(max_retries=2, interval=1)
     def record(self):
         """Capture a recording and return the data as a numpy array."""
         url = f'{self.addr}/record'
@@ -547,6 +544,7 @@ class DAQ:
         src = io.BytesIO(resp.content)
         return np.loadtxt(src, delimiter=',', skiprows=1)
 
+    @retry(max_retries=2, interval=1)
     def raw(self, cmd):
         """Raw sends text to the device and returns any response."""
         url = f'{self.addr}/raw'
