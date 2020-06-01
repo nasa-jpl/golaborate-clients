@@ -8,8 +8,6 @@
 import numbers
 from io import BytesIO
 
-import numpy as np
-
 from astropy import units as u
 from astropy.io import fits
 
@@ -587,3 +585,28 @@ class Camera:
 
 
 SDK3Cam = Camera
+
+
+class EMCCD(Camera):
+    """Subclass of Camera that forbids excessively cold temperatures."""
+
+    def temperature_setpt(self, valueS=None):
+        """Get (valueS=None) or set the current temperature setpoint.
+
+        Parameters
+        ----------
+        valueS : `str`, optional
+            a string representing a temperature.  Must be in self.temperature_setpt_options.
+
+        Returns
+        -------
+        `str`
+            the current temperature setpoint, in Celcius
+
+        """
+        if valueS is not None:
+            f = float(valueS)
+            if f < -25:
+                raise ValueError("it's forbidden to set the TEC cooler than this.")
+
+        return super().temeprature_setpt(valueS)
