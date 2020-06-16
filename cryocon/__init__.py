@@ -2,8 +2,7 @@
 import requests
 
 from golab_common import raise_err
-
-from retry import retry
+from golab_common.retry import retry
 
 ABS_ZERO = -273.15
 

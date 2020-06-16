@@ -2,7 +2,7 @@
 
 import requests
 
-from retry import retry
+from golab_common.retry import retry
 
 from golab_common import niceaddr, raise_err
 

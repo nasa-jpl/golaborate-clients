@@ -5,7 +5,7 @@ import requests
 
 import numpy as np
 
-from retry import retry
+from golab_common.retry import retry
 
 from golab_common import raise_err
 

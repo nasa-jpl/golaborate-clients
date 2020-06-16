@@ -6,7 +6,7 @@ try:
 except ImportError:
     pass
 
-from retry import retry
+from golab_common.retry import retry
 
 from golab_common import raise_err, niceaddr
 

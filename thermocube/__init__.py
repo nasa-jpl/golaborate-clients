@@ -1,7 +1,7 @@
 """thermocube provides tools for accessing thermocube chillers thanks to a go-hcit middleman."""
 import requests
 
-from retry import retry
+from golab_common.retry import retry
 
 from golab_common import raise_err, niceaddr
 
