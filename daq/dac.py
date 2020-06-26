@@ -1,0 +1,154 @@
+"""DAC is the arm of DAQ that deals with D to A."""
+
+import requests
+
+from golab_common import niceaddr, raise_err
+
+
+class DAC:
+    """D to A converter."""
+
+    def __init__(self, addr):
+        """Create a new DAC instance.
+
+        Parameters
+        ----------
+        addr : `str`
+            "root" address of the golab server, e.g. localhost:8000/my-dac
+
+        """
+        self.addr = niceaddr(addr)
+
+    def output(self, channels, voltages=None):
+        """Read the ideal output of a channel, or write voltages to a channel.
+
+        Parameters
+        ----------
+        channels : `int` or Iterable of ints
+            either a single channel, channels=1, or a sequence of channels
+            channels=[1,2,3]
+        voltages : `float` or Iterable of float
+            either a single float, voltages=1.234 or a sequence of floats,
+            voltage=[1.234, 2.345, 3.456]
+            if None, reads the ideal output
+
+        Returns
+        -------
+        `None` or `float` or Iterable of floats
+            None if voltages != None
+            single float if voltages=None and channels is an int,
+            list of float otherwise
+
+        """
+        if isinstance(channels, int):
+            url = f'{self.addr}/output'
+        else:
+            url = f'{self.addr}/output-multi'
+            if voltages is not None:
+                voltages = list(voltages)
+            channels = list(channels)
+
+        if voltages is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()
+        else:
+            resp = requests.post(url, json={
+                'channel': channels,
+                'voltage': voltages})
+            raise_err(resp)
+
+    def output_DN(self, channels, dns=None):
+        """Read the ideal output of a channel, or write 16-bit DN to a channel.
+
+        Parameters
+        ----------
+        channels : `int` or Iterable of ints
+            either a single channel, channels=1, or a sequence of channels
+            channels=[1,2,3]
+        dns : `int` or Iterable of int
+            either a single int, voltages=2**15 or a sequence of ints,
+            voltage=[0, 2049, 4096]
+            if None, reads the ideal output
+
+        Returns
+        -------
+        `None` or `int` or Iterable of ints
+            None if dns != None
+            single int if dns=None and channels is an int,
+            list of ints otherwise
+
+        """
+        if isinstance(channels, int):
+            url = f'{self.addr}/output-dn'
+        else:
+            url = f'{self.addr}/output-dn-multi'
+            if dns is not None:
+                dns = list(dns)
+            channels = list(channels)
+
+        if dns is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()
+        else:
+            resp = requests.post(url, json={
+                'channel': channels,
+                'dn': dns})
+            raise_err(resp)
+
+    def range(self, channel, range_=None):
+        """Configure the output range of a channel.
+
+        Parameters
+        ----------
+        channel : `int`
+            a channel identifier
+        range : `str`, optional
+            a CSV of lower and upper voltages; <low>,<high>.
+            E.g., "0,10" or "-5,5" or "-2.5,7.5", etc.
+            Voltages in volts.
+            if None, returns the range which is active
+
+        Returns
+        -------
+        `str`
+            range of a channel, formatted as above.
+
+        """
+        url = f'{self.addr}/range'
+        if range_ is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()['str']
+        else:
+            resp = requests.post(url, json={'channel': channel, 'range': range_})
+            raise_err(resp)
+
+    def simultaneous(self, channel, boolean):
+        """Configure the output range of a channel.
+
+        Parameters
+        ----------
+        channel : `int`
+            a channel identifier
+        range : `str`, optional
+            a CSV of lower and upper voltages; <low>,<high>.
+            E.g., "0,10" or "-5,5" or "-2.5,7.5", etc.
+            Voltages in volts.
+            if None, returns the range which is active
+
+        Returns
+        -------
+        `str`
+            range of a channel, formatted as above.
+
+        """
+        url = f'{self.addr}/simultaneous'
+        if boolean is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()['bool']
+        else:
+            resp = requests.post(url, json={'channel': channel, 'simultaneous': boolean})
+            raise_err(resp)
