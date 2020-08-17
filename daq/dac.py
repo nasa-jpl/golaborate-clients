@@ -80,9 +80,9 @@ class DAC:
 
         """
         if isinstance(channels, int):
-            url = f'{self.addr}/output-dn'
+            url = f'{self.addr}/output-dn-16'
         else:
-            url = f'{self.addr}/output-dn-multi'
+            url = f'{self.addr}/output-multi-dn-16'
             if dns is not None:
                 dns = list(dns)
             channels = list(channels)
@@ -125,7 +125,7 @@ class DAC:
             resp = requests.post(url, json={'channel': channel, 'range': range_})
             raise_err(resp)
 
-    def simultaneous(self, channel, boolean):
+    def simultaneous(self, channel, boolean=None):
         """Configure the output range of a channel.
 
         Parameters
@@ -152,3 +152,98 @@ class DAC:
         else:
             resp = requests.post(url, json={'channel': channel, 'simultaneous': boolean})
             raise_err(resp)
+
+    def operating_mode(self, channel, mode=None):
+        """Configure the operating mode of a channel.
+
+        Parameters
+        ----------
+        channel : `int`
+            a channel identifier
+        mode : `str`, {"single", "waveform"}
+            which mode to use (single sample or waveform)
+
+        Returns
+        -------
+        `str`
+            the operating mode
+
+        """
+        url = f'{self.addr}/operating-mode'
+        if mode is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()['str']
+        else:
+            resp = requests.post(url, json={'channel': channel, 'operatingMode': mode})
+            raise_err(resp)
+
+    def trigger_mode(self, channel, mode=None):
+        """Configure the triggering mode of a channel.
+
+        Parameters
+        ----------
+        channel : `int`
+            a channel identifier
+        mode : `str`, {"software", "timer", "external"}
+            how to trigger
+
+        Returns
+        -------
+        `str`
+            the triggering mode
+
+        """
+        url = f'{self.addr}/triggering-mode'
+        if mode is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()['str']
+        else:
+            resp = requests.post(url, json={'channel': channel, 'operatingMode': mode})
+            raise_err(resp)
+
+    def start(self):
+        """Start playback."""
+        url = f'{self.addr}/playback/start'
+        resp = requests.post(url)
+        raise_err(resp)
+        return
+
+    def stop(self):
+        """Stop playback."""
+        url = f'{self.addr}/playback/stop'
+        resp = requests.post(url)
+        raise_err(resp)
+        return
+
+    def timer_period_ns(self, nanoseconds=None):
+        """Configure the on-board timer period, which is global to the DAC.
+
+        Parameters
+        ----------
+        nanoseconds : `int`
+            number of nanoseconds between samples at the output.
+            For the Acromag AP235's internal timer, must be modulo 32.
+
+        Returns
+        -------
+        `int`
+            nanoseconds between timer ticks
+
+        """
+        url = f'{self.addr}/timer-period'
+        if nanoseconds is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()['uint']
+        else:
+            resp = requests.post(url, json={'uint': nanoseconds})
+            raise_err(resp)
+
+    def timer_period_s(self, seconds=None):
+        """Same as timer_period_ns, except the argument is in seconds."""
+        if seconds is None:
+            return self.timer_period_ns(None) / 1e9
+        else:
+            return self.timer_period_ns(seconds*1e9)
