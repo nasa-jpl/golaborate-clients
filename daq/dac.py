@@ -118,7 +118,7 @@ class DAC:
         """
         url = f'{self.addr}/range'
         if range_ is None:
-            resp = requests.get(url)
+            resp = requests.get(url, json={'channel': channel})
             raise_err(resp)
             return resp.json()['str']
         else:
@@ -146,7 +146,7 @@ class DAC:
         """
         url = f'{self.addr}/simultaneous'
         if boolean is None:
-            resp = requests.get(url)
+            resp = requests.get(url, json={'channel': channel})
             raise_err(resp)
             return resp.json()['bool']
         else:
@@ -171,7 +171,7 @@ class DAC:
         """
         url = f'{self.addr}/operating-mode'
         if mode is None:
-            resp = requests.get(url)
+            resp = requests.get(url, json={'channel': channel})
             raise_err(resp)
             return resp.json()['str']
         else:
@@ -196,11 +196,11 @@ class DAC:
         """
         url = f'{self.addr}/triggering-mode'
         if mode is None:
-            resp = requests.get(url)
+            resp = requests.get(url, json={'channel': channel})
             raise_err(resp)
             return resp.json()['str']
         else:
-            resp = requests.post(url, json={'channel': channel, 'operatingMode': mode})
+            resp = requests.post(url, json={'channel': channel, 'triggerMode': mode})
             raise_err(resp)
 
     def start(self):
