@@ -58,7 +58,7 @@ class DAC:
                 'voltage': voltages})
             raise_err(resp)
 
-    def output_DN(self, channels, dns=None):
+    def output_dn(self, channels, dns=None):
         """Read the ideal output of a channel, or write 16-bit DN to a channel.
 
         Parameters
