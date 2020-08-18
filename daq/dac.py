@@ -242,7 +242,7 @@ class DAC:
             raise_err(resp)
 
     def timer_period_s(self, seconds=None):
-        """Same as timer_period_ns, except the argument is in seconds."""
+        """Timer_period_ns, except the argument is in seconds."""
         if seconds is None:
             return self.timer_period_ns(None) / 1e9
         else:
