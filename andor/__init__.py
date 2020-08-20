@@ -277,7 +277,6 @@ class Camera:
         ----------
         dict_ : `dict`
             dictionary with keys left, top, width, height.
-            Not all keys are needed.  Partial updates are allowed.
 
 
         Returns
