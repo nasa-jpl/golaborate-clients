@@ -606,6 +606,6 @@ class EMCCD(Camera):
         if valueS is not None:
             f = float(valueS)
             if f < -25:
-                raise ValueError("it's forbidden to set the TEC cooler than this.")
+                raise ValueError("it's forbidden to set the TEC cooler than -25C.")
 
         return super().temeprature_setpt(valueS)
