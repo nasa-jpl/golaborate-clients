@@ -560,17 +560,17 @@ class Camera:
 
     # this is shutter control
     def shutter(self, open=None):
-        """Get or set the EM gain mode.  Get if mode=None, else Set.
+        """Open or close the shutter.  Get if it is open or closed with open=None
 
         Parameters
         ----------
-        mode : `str`, {'Advanced'}
-            em gain mode
+        open : `bool`,
+            if True, the shutter opens
 
         Returns
         -------
-        `str`
-            the current EM gain mode
+        `bool`
+            True if the shutter is open
 
         """
         url = f'{self.addr}/shutter'
