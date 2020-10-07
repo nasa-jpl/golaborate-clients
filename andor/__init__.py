@@ -559,12 +559,12 @@ class Camera:
         return resp.json()
 
     # this is shutter control
-    def shutter(self, open=None):
+    def shutter(self, open_=None):
         """Open or close the shutter.  Get if it is open or closed with open=None
 
         Parameters
         ----------
-        open : `bool`,
+        open : `bool`
             if True, the shutter opens
 
         Returns
@@ -574,12 +574,37 @@ class Camera:
 
         """
         url = f'{self.addr}/shutter'
-        if open is None:
+        if open_ is None:
             resp = requests.get(url)
             raise_err(resp)
             return resp.json()['bool']
         else:
-            resp = requests.post(url, json={'bool': open})
+            resp = requests.post(url, json={'bool': open_})
+            raise_err(resp)
+
+    def shutter_auto(self, automatic=None):
+        """Configure the camera for automatic (camera-determined) shutter control.
+
+        Parameters
+        ----------
+        automatic : `bool`
+            if True, the camera automatically controls the shutter opening, closing
+            and timing.  If False, the user must manually manipulate the shutter
+            with the shutter() function
+
+        Returns
+        -------
+        `bool`
+            True if the shutter is automatically controlled/managed by the camera.
+
+        """
+        url = f'{self.addr}/shutter-auto'
+        if automatic is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()['bool']
+        else:
+            resp = requests.post(url, json={'bool': automatic})
             raise_err(resp)
 
 
