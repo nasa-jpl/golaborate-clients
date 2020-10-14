@@ -607,6 +607,29 @@ class Camera:
             resp = requests.post(url, json={'bool': automatic})
             raise_err(resp)
 
+    def shutter_speed(self, texpS=None):
+        """Configure the shutter speed for the camera.
+
+        Parameters
+        ----------
+        texp_S : `float`
+            Shutter speed in seconds.  If None, gets.
+
+        Returns
+        -------
+        `bool`
+            True if the shutter is automatically controlled/managed by the camera.
+
+        """
+        url = f'{self.addr}/shutter-speed'
+        if texpS is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()['f64']
+        else:
+            resp = requests.post(url, json={'f64': texpS})
+            raise_err(resp)
+
 
 SDK3Cam = Camera
 
