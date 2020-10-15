@@ -617,8 +617,8 @@ class Camera:
 
         Returns
         -------
-        `bool`
-            True if the shutter is automatically controlled/managed by the camera.
+        `float`
+            Shutter speed in seconds
 
         """
         url = f'{self.addr}/shutter-speed'
