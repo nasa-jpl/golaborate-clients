@@ -182,17 +182,7 @@ class Camera:
 
         """
         url = f'{self.addr}/feature/{feature}'
-        # andor-http server requires us to properly tag the datatype
-        if isinstance(value, str):
-            key = 'str'
-        elif isinstance(value, bool):
-            key = 'bool'
-        elif isinstance(value, float):
-            key = 'f64'
-        elif isinstance(value, int):
-            key = 'int'
-
-        payload = {key: value}
+        payload = {'value': value}
         resp = requests.post(url, json=payload)
         raise_err(resp)
         return
