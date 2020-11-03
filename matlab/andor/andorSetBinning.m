@@ -7,5 +7,5 @@ function andorSetBinning(s, fctr)
     s2.v = fctr;
     options = weboptions('MediaType', 'application/json');
     url = [s.CameraURL,'/binning'];
-    webwrite(url, s2, options)
+    webwrite(url, s2, options);
 end

@@ -5,5 +5,5 @@ function andorSetExposureTime(s, tSec)
     s2.f64 = tSec;
     options = weboptions('MediaType', 'application/json');
     url = [s.CameraURL,'/exposure-time'];
-    webwrite(url, s2, options)
+    webwrite(url, s2, options);
 end

@@ -6,5 +6,5 @@ function andorSetRecorderEnabled(s, boolV)
      s2.bool = boolV;
      options = weboptions('MediaType', 'application/json');
      url = strcat(s.CameraURL, '/autowrite/enabled');
-     webwrite(url, s2, options)
+     webwrite(url, s2, options);
 end

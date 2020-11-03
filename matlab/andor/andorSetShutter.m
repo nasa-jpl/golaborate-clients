@@ -6,5 +6,5 @@ function andorSetShutter(s, open)
     s2.bool = open;
     options = weboptions('MediaType', 'application/json');
     url = [s.CameraURL,'/shutter'];
-    webwrite(url, s2, options)
+    webwrite(url, s2, options);
 end

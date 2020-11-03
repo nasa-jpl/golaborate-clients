@@ -6,5 +6,5 @@ function andorSetEMGainMode(s, modeStr)
     s2.str = modeStr;
     options = weboptions('MediaType', 'application/json');
     url = [s.CameraURL,'/em-gain-mode'];
-    webwrite(url, s2, options)
+    webwrite(url, s2, options);
 end
