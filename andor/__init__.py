@@ -460,7 +460,7 @@ class Camera:
         else:
             return imread(resp.content, format=fmt)
 
-    def burst(self, frames, fps, serverSpool=0):
+    def burst(self, frames, fps, serverSpool=0, downloads='each'):
         """Take a burst of images, returned as a generator of 2D arrays.
 
         Parameters
@@ -473,14 +473,28 @@ class Camera:
             size of the spool (in frames) to use on the server to buffer,
             if the client can't keep up.  If Zero, the spool size is set to
             frames*fps, which may cause out of memory errors.
+        downloads : `str`, optional, {'each', 'all'}
+            flag for controlling how images are downlinked from the camera server.
+            each downloads each frame one at a time.
+            all downloads the entire burst in one transfer
+            The former allows concurrency between capture and processing, at the
+            cost of higher total transfer latency (n images x round trip added
+            to capture time).  The latter has lower total latency at the expense
+            of no concurrency.  'each' is suited to large sequences that would
+            exceed 2GB of data, a limit imposed by the cFITSIO for the client.
+
 
         Returns
         -------
         `generator`
-            a generator yielding 2D ndarrays.  An exception may be raised while
-            iterating it if one is encountered on the server.
+            if downloads == each, a generator yielding {frames} 2D ndarrays.
+            if downloads == all, a generator yielding one 3D ndarray
+
+            An exception may be raised while iterating it if one is encountered
+            on the server.
 
         """
+        downloads = downloads.lower()
         payload = {
             'fps': fps,
             'frames': frames,
@@ -488,8 +502,14 @@ class Camera:
         }
         resp = requests.post(f'{self.addr}/burst/setup', json=payload)
         raise_err(resp)
-        for _ in range(frames):
-            resp = requests.get(f'{self.addr}/burst/frame')
+        if downloads == 'each':
+            for _ in range(frames):
+                resp = requests.get(f'{self.addr}/burst/frame')
+                raise_err(resp)
+                hdu = fits.open(BytesIO(resp.content))
+                yield hdu[0].data
+        else:
+            resp = requests.get(f'{self.addr}/burst/all-frames')
             raise_err(resp)
             hdu = fits.open(BytesIO(resp.content))
             yield hdu[0].data
