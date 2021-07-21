@@ -153,3 +153,22 @@ class Controller:
             ax = Axis(self.addr, axis)
             setattr(self, axis, ax)
             setattr(self, axis.lower(), ax)
+
+    def raw(self, text):
+        """Send a string to the controller and get back any response.
+
+        Parameters
+        ----------
+        text : `str`
+            the text to send, will have a newline added.
+
+        Returns
+        -------
+        `str`
+            any text returned
+
+        """
+        url = f'{self.addr}/raw'
+        payload = {'str': text}
+        resp = requests.post(url, json=payload)
+        raise_err(resp)
