@@ -172,3 +172,4 @@ class Controller:
         payload = {'str': text}
         resp = requests.post(url, json=payload)
         raise_err(resp)
+        return resp.json().get('str', None)
