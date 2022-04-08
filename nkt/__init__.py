@@ -199,3 +199,12 @@ class SuperK:
         resp = requests.get(url)
         raise_err(resp)
         return resp.json()
+
+    @property
+    @retry(max_retries=2, interval=1)
+    def emission_runtime(self):
+        """Emission runtime of the laser in seconds."""
+        url = f'{self.addr}/emission-runtime'
+        resp = requests.get(url)
+        raise_err(resp)
+        return resp.json()['f64']
