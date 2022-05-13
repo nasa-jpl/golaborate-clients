@@ -135,6 +135,27 @@ class Axis:
         resp = requests.post(url, json=payload, params={'relative': True})
         raise_err(resp)
 
+    @retry(max_retries=2, interval=1)
+    def synchronous(self, sync=None):
+        url = f'{self.addr}/axis/{self.name}/synchronous'
+        if sync is None:
+            resp = requests.get(url)
+            raise_err(resp)
+            return resp.json()['bool']
+        else:
+            payload = {'bool': sync}
+            resp = requests.post(url, json=payload)
+            raise_err(resp)
+
+    @property
+    @retry(max_retries=2, interval=1)
+    def inpos(self):
+        """Position of the axis."""
+        url = f'{self.addr}/axis/{self.name}/inposition'
+        resp = requests.get(url)
+        raise_err(resp)
+        return resp.json()['bool']
+
 
 class Controller:
     """Controller represents a motion controller."""
