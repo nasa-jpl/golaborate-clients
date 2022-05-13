@@ -1,5 +1,5 @@
 """motion enables nice control of motion controllers (and stages) over HTTP via a go-hcit server."""
-
+import time
 import requests
 
 from golab_common.retry import retry
@@ -106,7 +106,7 @@ class Axis:
             raise_err(resp)
 
     @retry(max_retries=2, interval=1)
-    def move_abs(self, pos):
+    def move_abs(self, pos, async_max_checks=-1):
         """Move the axis to an absolute position.
 
         Parameters
@@ -119,6 +119,15 @@ class Axis:
         payload = {'f64': float(pos)}
         resp = requests.post(url, json=payload)
         raise_err(resp)
+
+        try:
+            sync = self.synchronous()
+        except:
+            # unknown, we are in sync mode
+            sync = True
+
+        if not sync:
+            wait_inpos(self, async_max_checks)
 
     @retry(max_retries=2, interval=1)
     def move_rel(self, pos):
@@ -194,3 +203,26 @@ class Controller:
         resp = requests.post(url, json=payload)
         raise_err(resp)
         return resp.json().get('str', None)
+
+
+def wait_inpos(axis, max_check=-1):
+    # check the first time
+    start = time.now()
+    inpos = axis.inpos
+    end = time.now()
+    deltaT = end - start
+    wait_t = deltaT * 4
+    if inpos:
+        return
+
+    time.sleep(wait_t)
+
+    if max_check >= 1:
+        checks = 1
+        while checks <= max_check:
+            inpos = axis.inpos
+            if inpos:
+                return
+
+            checks += 1
+            time.sleep(wait_t)
