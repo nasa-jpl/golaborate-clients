@@ -207,9 +207,9 @@ class Controller:
 
 def wait_inpos(axis, max_check=-1):
     # check the first time
-    start = time.now()
+    start = time.time()
     inpos = axis.inpos
-    end = time.now()
+    end = time.time()
     deltaT = end - start
     wait_t = deltaT * 4
     if inpos:
