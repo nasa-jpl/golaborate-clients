@@ -126,6 +126,7 @@ class Axis:
             # unknown, we are in sync mode
             sync = True
 
+        print('in move abs, sync was', sync)
         if not sync:
             wait_inpos(self, async_max_checks)
 
@@ -206,9 +207,11 @@ class Controller:
 
 
 def wait_inpos(axis, max_check=-1):
+    print('start wait in pos')
     # check the first time
     start = time.time()
     inpos = axis.inpos
+    print('initial check in pos', inpos)
     end = time.time()
     deltaT = end - start
     wait_t = deltaT * 4
@@ -221,6 +224,7 @@ def wait_inpos(axis, max_check=-1):
         checks = 1
         while checks <= max_check:
             inpos = axis.inpos
+            print(f'check {checks} inpos={inpos}')
             if inpos:
                 return
 
