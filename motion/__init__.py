@@ -1,5 +1,7 @@
 """motion enables nice control of motion controllers (and stages) over HTTP via a go-hcit server."""
 import time
+import math
+
 import requests
 
 from golab_common.retry import retry
@@ -15,23 +17,23 @@ class Axis:
 
         Parameters
         ----------
-        addr : `str`
+        addr : str
             "root" address of the go-hcit motion server.
-        name : `str`
+        name : str
             name of the axis, as the controller knows it
 
         """
         self.addr = niceaddr(addr)
         self.name = name
 
-    @retry(max_retries=2, interval=1)
+    @retry(max_retries=3, interval=5)
     def home(self):
         """Home the axis."""
         url = f'{self.addr}/axis/{self.name}/home'
         resp = requests.post(url)
         raise_err(resp)
 
-    @retry(max_retries=2, interval=1)
+    @retry(max_retries=3, interval=5)
     def enable(self):
         """Enable the axis."""
         url = f'{self.addr}/axis/{self.name}/enabled'
@@ -39,7 +41,7 @@ class Axis:
         resp = requests.post(url, json=payload)
         raise_err(resp)
 
-    @retry(max_retries=2, interval=1)
+    @retry(max_retries=3, interval=5)
     def disable(self):
         """Disable the axis."""
         url = f'{self.addr}/axis/{self.name}/enabled'
@@ -47,7 +49,7 @@ class Axis:
         resp = requests.post(url, json=payload)
         raise_err(resp)
 
-    @retry(max_retries=2, interval=1)
+    @retry(max_retries=3, interval=5)
     def initialize(self):
         """Initialize the axis."""
         url = f'{self.addr}/axis/{self.name}/initialize'
@@ -55,7 +57,7 @@ class Axis:
         raise_err(resp)
 
     @property
-    @retry(max_retries=2, interval=1)
+    @retry(max_retries=3, interval=5)
     def enabled(self):
         """Boolean for if the axis is enabled."""
         url = f'{self.addr}/axis/{self.name}/enabled'
@@ -64,7 +66,7 @@ class Axis:
         return resp.json()['bool']
 
     @property
-    @retry(max_retries=2, interval=1)
+    @retry(max_retries=3, interval=5)
     def pos(self):
         """Position of the axis."""
         url = f'{self.addr}/axis/{self.name}/pos'
@@ -73,25 +75,25 @@ class Axis:
         return resp.json()['f64']
 
     @property
-    @retry(max_retries=2, interval=1)
+    @retry(max_retries=3, interval=5)
     def limits(self):
         """Limits of the axis."""
         resp = requests.get(f'{self.addr}/axis/{self.name}/limits')
         raise_err(resp)
         return resp.json()
 
-    @retry(max_retries=2, interval=1)
+    @retry(max_retries=3, interval=5)
     def velocity(self, value=None):
         """Velocity setpoint of the axis.
 
         Parameters
         ----------
-        value: `float`
+        value: float
             velocity of the axis, in mm/s
 
         Returns
         -------
-        `float`
+        float
             velocity, if value=None
 
         """
@@ -105,37 +107,60 @@ class Axis:
             resp = requests.post(url, json=payload)
             raise_err(resp)
 
-    @retry(max_retries=2, interval=1)
-    def move_abs(self, pos, async_max_checks=-1):
+    @retry(max_retries=3, interval=5)
+    def move_abs(self, pos, sync=True, wait_inpos_kwargs=None):
         """Move the axis to an absolute position.
 
         Parameters
         ----------
-        pos : `float`
+        pos : float
             position to move to
+        sync : bool, optional
+            if True and the controller is configured in asynchronous mode, poll
+            until it is in position using self.wait_inpos and associated kwargs
+        wait_inpos_kwargs : dict, optional
+            keyword arguments for self.wait_inpos
+
 
         """
+        start_p = self.pos
+
         url = f'{self.addr}/axis/{self.name}/pos'
         payload = {'f64': float(pos)}
         resp = requests.post(url, json=payload)
         raise_err(resp)
 
         try:
-            sync = self.synchronous()
-        except:
-            # unknown, we are in sync mode
-            sync = True
+            mode_sync = self.synchronous()
+        except Exception:
+            # unknown, we are in sync mode (tends to be default)
+            mode_sync = True
 
-        if not sync:
-            wait_inpos(self, async_max_checks)
+        if not mode_sync and sync:
+            if wait_inpos_kwargs is None:
+                wait_inpos_kwargs = {}
 
-    @retry(max_retries=2, interval=1)
-    def move_rel(self, pos):
+            # check if we know our velocity and delta position
+            try:
+                vel = self.velocity()
+            except Exception:
+                # unknown
+                vel = 0
+
+            if vel != 0:
+                deltap = abs(pos - start_p)
+                dT = deltap / vel
+                time.sleep(0.9*dT)
+
+            self.wait_inpos(**wait_inpos_kwargs)
+
+    @retry(max_retries=3, interval=5)
+    def move_rel(self, pos, sync=True, wait_inpos_kwargs=None):
         """Move the axis by a relative amount.
 
         Parameters
         ----------
-        pos : `float`
+        pos : float
             amount to move by
 
         """
@@ -144,8 +169,49 @@ class Axis:
         resp = requests.post(url, json=payload, params={'relative': True})
         raise_err(resp)
 
-    @retry(max_retries=2, interval=1)
+        try:
+            mode_sync = self.synchronous()
+        except Exception:
+            # unknown, we are in sync mode (tends to be default)
+            mode_sync = True
+
+        if not mode_sync and sync:
+            if wait_inpos_kwargs is None:
+                wait_inpos_kwargs = {}
+
+            # check if we know our velocity and delta position
+            try:
+                vel = self.velocity()
+            except Exception:
+                # unknown
+                vel = 0
+
+            if vel != 0:
+                deltap = abs(pos)
+                dT = deltap / vel
+                time.sleep(0.9*dT)
+
+            self.wait_inpos(**wait_inpos_kwargs)
+
+    @retry(max_retries=3, interval=5)
     def synchronous(self, sync=None):
+        """Synchronous mode for the axis.
+
+        wait_inpos and the sync arguments to the two move functions provide
+        comprehensive support for asynchronous styles
+
+        Parameters
+        ----------
+        sync : bool
+            True = controller replies after move ended
+            False = controller replies after move starts
+
+        Returns
+        -------
+        bool
+            synchronous, if value=None
+
+        """
         url = f'{self.addr}/axis/{self.name}/synchronous'
         if sync is None:
             resp = requests.get(url)
@@ -157,13 +223,67 @@ class Axis:
             raise_err(resp)
 
     @property
-    @retry(max_retries=2, interval=1)
+    @retry(max_retries=3, interval=5)
     def inpos(self):
         """Position of the axis."""
         url = f'{self.addr}/axis/{self.name}/inposition'
         resp = requests.get(url)
         raise_err(resp)
         return resp.json()['bool']
+
+    def wait_inpos(self, max_check=None, max_time=None, min_interval=0.1, controller_latency_scale=4):
+        """Return when an axis to be in position.
+
+        Parameters
+        ----------
+        max_checks : int, optional
+            the maximum number of checks to perform
+            if None, unbounded
+        max_time : float, optional
+            the maximum duration (seconds) to wait for the axis to be in position
+            if None, unbounded
+        min_interval : float, optional
+            the minimum checking interval, seconds
+            if None, controller_latency_scale times a measurement of the latency
+            is used
+            i.e., time_to_check * controller_latency_scale is the polling interval
+
+        """
+    # check the first time, profile the time taken to check
+        start = time.time()
+        inpos = self.inpos
+        end = time.time()
+        deltaT = end - start
+        wait_t = deltaT * controller_latency_scale
+
+        if min_interval is not None and wait_t < min_interval:
+            wait_t = min_interval
+
+        if max_time is None:
+            max_time = math.inf
+
+        if inpos:
+            return
+
+        time.sleep(wait_t)
+
+        if max_check is not None:
+            checks = 1
+            while checks <= max_check and not self.inpos:
+                end = time.time()
+                dT = end - start
+                if dT > max_time:
+                    return
+
+                checks += 1
+                time.sleep(wait_t)
+        else:
+            while not self.inpos:
+                end = time.time()
+                dT = end - start
+                if dT > max_time:
+                    return
+                time.sleep(wait_t)
 
 
 class Controller:
@@ -174,7 +294,7 @@ class Controller:
 
         Parameters
         ----------
-        addr : `str`
+        addr : str
             "root" address of the go-hcit motion server.
 
         """
@@ -189,12 +309,12 @@ class Controller:
 
         Parameters
         ----------
-        text : `str`
+        text : str
             the text to send, will have a newline added.
 
         Returns
         -------
-        `str`
+        str
             any text returned
 
         """
@@ -203,29 +323,3 @@ class Controller:
         resp = requests.post(url, json=payload)
         raise_err(resp)
         return resp.json().get('str', None)
-
-
-def wait_inpos(axis, max_check=-1):
-    # check the first time
-    start = time.time()
-    inpos = axis.inpos
-    end = time.time()
-    deltaT = end - start
-    wait_t = deltaT * 4
-    if inpos:
-        return
-
-    time.sleep(wait_t)
-
-    if max_check >= 1:
-        checks = 1
-        while checks <= max_check:
-            inpos = axis.inpos
-            if inpos:
-                return
-
-            checks += 1
-            time.sleep(wait_t)
-    else:
-        while not axis.inpos:
-            time.sleep(wait_t)

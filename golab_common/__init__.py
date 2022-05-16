@@ -6,7 +6,7 @@ def raise_err(resp):
 
     Parameters
     ----------
-    resp : `requests.Response`
+    resp : requests.Response
         a response with a status code
 
     Raises
