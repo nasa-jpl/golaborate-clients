@@ -1,6 +1,7 @@
 """motion enables nice control of motion controllers (and stages) over HTTP via a go-hcit server."""
 import time
 import math
+import warnings
 
 import requests
 
@@ -123,36 +124,13 @@ class Axis:
 
 
         """
-        start_p = self.pos
-
         url = f'{self.addr}/axis/{self.name}/pos'
         payload = {'f64': float(pos)}
         resp = requests.post(url, json=payload)
         raise_err(resp)
 
-        try:
-            mode_sync = self.synchronous()
-        except Exception:
-            # unknown, we are in sync mode (tends to be default)
-            mode_sync = True
-
-        if not mode_sync and sync:
-            if wait_inpos_kwargs is None:
-                wait_inpos_kwargs = {}
-
-            # check if we know our velocity and delta position
-            try:
-                vel = self.velocity()
-            except Exception:
-                # unknown
-                vel = 0
-
-            if vel != 0:
-                deltap = abs(pos - start_p)
-                dT = deltap / vel
-                time.sleep(0.9*dT)
-
-            self.wait_inpos(**wait_inpos_kwargs)
+        if not sync and wait_inpos_kwargs is not None:
+            warnings.warn('move_abs: sync and wait_inpos_kwargs are deprecated and have no effect')
 
     @retry(max_retries=3, interval=5)
     def move_rel(self, pos, sync=True, wait_inpos_kwargs=None):
@@ -169,29 +147,8 @@ class Axis:
         resp = requests.post(url, json=payload, params={'relative': True})
         raise_err(resp)
 
-        try:
-            mode_sync = self.synchronous()
-        except Exception:
-            # unknown, we are in sync mode (tends to be default)
-            mode_sync = True
-
-        if not mode_sync and sync:
-            if wait_inpos_kwargs is None:
-                wait_inpos_kwargs = {}
-
-            # check if we know our velocity and delta position
-            try:
-                vel = self.velocity()
-            except Exception:
-                # unknown
-                vel = 0
-
-            if vel != 0:
-                deltap = abs(pos)
-                dT = deltap / vel
-                time.sleep(0.9*dT)
-
-            self.wait_inpos(**wait_inpos_kwargs)
+        if not sync and wait_inpos_kwargs is not None:
+            warnings.warn('move_abs: sync and wait_inpos_kwargs are deprecated and have no effect')
 
     @retry(max_retries=3, interval=5)
     def synchronous(self, sync=None):
@@ -249,7 +206,7 @@ class Axis:
             i.e., time_to_check * controller_latency_scale is the polling interval
 
         """
-    # check the first time, profile the time taken to check
+        # check the first time, profile the time taken to check
         start = time.time()
         inpos = self.inpos
         end = time.time()
