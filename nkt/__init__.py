@@ -15,7 +15,7 @@ class SuperK:
 
         Parameters
         ----------
-        addr : `str`
+        addr : str
             IP address (port included) that the HTTP adapter server is listening at
 
         """
@@ -32,9 +32,9 @@ class SuperK:
 
         Parameters
         ----------
-        center : `float`
-            center wavelength, if `None` gets the current values
-        bw : `float`
+        center : float
+            center wavelength, if None gets the current values
+        bw : float
             full bandwidth
 
         Returns
@@ -61,12 +61,12 @@ class SuperK:
 
         Parameters
         ----------
-        wvl_nm : `float`
+        wvl_nm : float
             wavelength in nanometers, if None gets, else sets
 
         Returns
         -------
-        `float`
+        float
             short wavelength, nm
 
         """
@@ -86,12 +86,12 @@ class SuperK:
 
         Parameters
         ----------
-        wvl_nm : `float`
+        wvl_nm : float
             wavelength in nanometers, if None gets, else sets
 
         Returns
         -------
-        `float`
+        float
             short wavelength, nm
 
         """
@@ -115,12 +115,12 @@ class SuperK:
 
         Parameters
         ----------
-        on : `bool`, optional
+        on : bool, optional
             None => get.  True => laser on.  False => laser off.
 
         Returns
         -------
-        `bool`
+        bool
             laser on/off
 
         """
@@ -140,12 +140,12 @@ class SuperK:
 
         Parameters
         ----------
-        pct : `float`, optional
+        pct : float, optional
             0=ND inactive, 100=ND at full strength.  If None, gets the value and returns it.
 
         Returns
         -------
-        `float`
+        float
             ND strength, percent
 
         """
@@ -165,12 +165,12 @@ class SuperK:
 
         Parameters
         ----------
-        pct : `float`, optional
+        pct : float, optional
             0= "off", 100= "full power".  If None, gets the value and returns it.
 
         Returns
         -------
-        `float`
+        float
             power level, percent
 
         """

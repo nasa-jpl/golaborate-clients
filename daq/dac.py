@@ -13,7 +13,7 @@ class DAC:
 
         Parameters
         ----------
-        addr : `str`
+        addr : str
             "root" address of the golab server, e.g. localhost:8000/my-dac
 
         """
@@ -24,17 +24,17 @@ class DAC:
 
         Parameters
         ----------
-        channels : `int` or Iterable of ints
+        channels : int or Iterable of ints
             either a single channel, channels=1, or a sequence of channels
             channels=[1,2,3]
-        voltages : `float` or Iterable of float
+        voltages : float or Iterable of float
             either a single float, voltages=1.234 or a sequence of floats,
             voltage=[1.234, 2.345, 3.456]
             if None, reads the ideal output
 
         Returns
         -------
-        `None` or `float` or Iterable of floats
+        None or float or Iterable of floats
             None if voltages != None
             single float if voltages=None and channels is an int,
             list of float otherwise
@@ -63,17 +63,17 @@ class DAC:
 
         Parameters
         ----------
-        channels : `int` or Iterable of ints
+        channels : int or Iterable of ints
             either a single channel, channels=1, or a sequence of channels
             channels=[1,2,3]
-        dns : `int` or Iterable of int
+        dns : int or Iterable of int
             either a single int, voltages=2**15 or a sequence of ints,
             voltage=[0, 2049, 4096]
             if None, reads the ideal output
 
         Returns
         -------
-        `None` or `int` or Iterable of ints
+        None or int or Iterable of ints
             None if dns != None
             single int if dns=None and channels is an int,
             list of ints otherwise
@@ -102,9 +102,9 @@ class DAC:
 
         Parameters
         ----------
-        channel : `int`
+        channel : int
             a channel identifier
-        range : `str`, optional
+        range : str, optional
             a CSV of lower and upper voltages; <low>,<high>.
             E.g., "0,10" or "-5,5" or "-2.5,7.5", etc.
             Voltages in volts.
@@ -112,7 +112,7 @@ class DAC:
 
         Returns
         -------
-        `str`
+        str
             range of a channel, formatted as above.
 
         """
@@ -130,9 +130,9 @@ class DAC:
 
         Parameters
         ----------
-        channel : `int`
+        channel : int
             a channel identifier
-        range : `str`, optional
+        range : str, optional
             a CSV of lower and upper voltages; <low>,<high>.
             E.g., "0,10" or "-5,5" or "-2.5,7.5", etc.
             Voltages in volts.
@@ -140,7 +140,7 @@ class DAC:
 
         Returns
         -------
-        `str`
+        str
             range of a channel, formatted as above.
 
         """
@@ -158,14 +158,14 @@ class DAC:
 
         Parameters
         ----------
-        channel : `int`
+        channel : int
             a channel identifier
-        mode : `str`, {"single", "waveform"}
+        mode : str, {"single", "waveform"}
             which mode to use (single sample or waveform)
 
         Returns
         -------
-        `str`
+        str
             the operating mode
 
         """
@@ -183,14 +183,14 @@ class DAC:
 
         Parameters
         ----------
-        channel : `int`
+        channel : int
             a channel identifier
-        mode : `str`, {"software", "timer", "external"}
+        mode : str, {"software", "timer", "external"}
             how to trigger
 
         Returns
         -------
-        `str`
+        str
             the triggering mode
 
         """
@@ -222,13 +222,13 @@ class DAC:
 
         Parameters
         ----------
-        nanoseconds : `int`
+        nanoseconds : int
             number of nanoseconds between samples at the output.
             For the Acromag AP235's internal timer, must be modulo 32.
 
         Returns
         -------
-        `int`
+        int
             nanoseconds between timer ticks
 
         """

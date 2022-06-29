@@ -14,14 +14,13 @@ class DewK:
 
         Parameters
         ----------
-        addr : `str`
+        addr : str
             a network address, with port added.  "host:port".
             HTTP prefix not needed.
 
         """
         self.addr = niceaddr(addr)
 
-    @property
     @retry(max_retries=2, interval=1)
     def reading(self):
         """Instantaneous Temp/Humidity reading."""

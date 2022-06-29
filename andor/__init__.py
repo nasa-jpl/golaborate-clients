@@ -26,12 +26,12 @@ def proces_exposure_time(t):
 
     Parameters
     ----------
-    t : `numbers.Number`, `str`, or `astropy.units.Quantity`
+    t : numbers.Number, str, or astropy.units.Quantity
         a time-like object.  If a number (int, float) units of seconds
 
     Returns
     -------
-    `str`
+    str
         a string looking like "30s" or "1h30m", or "10.5us" and so on.
 
     Raises
@@ -62,7 +62,7 @@ class Recorder:
 
         Parameters
         ----------
-        addr : `str`
+        addr : str
             the URL the go-hcit server is running on, with any stem for the recorder.
             The route addr/autowrite should exist.
 
@@ -74,12 +74,12 @@ class Recorder:
 
         Parameters
         ----------
-        srvpath : `str`
+        srvpath : str
             path *on the server* to store backups in
 
         Returns
         -------
-        `str`
+        str
             the path that files are saved to
 
         """
@@ -98,12 +98,12 @@ class Recorder:
 
         Parameters
         ----------
-        string : `str`
+        string : str
             prefix to use when naming files, prefix00000x.fits
 
         Returns
         -------
-        `str`
+        str
             the prefix that is currently in use
 
         """
@@ -122,12 +122,12 @@ class Recorder:
 
         Parameters
         ----------
-        boolean : `bool`
+        boolean : bool
             if None, get.  Else set.
 
         Returns
         -------
-        `bool`
+        bool
             whether the recorder is enabled
 
         """
@@ -150,10 +150,10 @@ class Camera:
 
         Parameters
         ----------
-        addr : `str`
+        addr : str
             "root" address of the go-hcit andor server, one level above the
             "/image" route.  Must incude port.  startswith http not needed.
-        time_convention : `str`, {'float', 'astropy'}
+        time_convention : str, {'float', 'astropy'}
             either float (exposure time returns as floating point seconds) or
             astropy (exposure time returns as astropy quantity)
 
@@ -163,7 +163,6 @@ class Camera:
         self.recorder = Recorder(addr)
 
     # generics
-    @property
     def features(self):
         """Dictionary mapping feature names to strings representing their types."""
         resp = requests.get(self.addr + "/feature")
@@ -175,9 +174,9 @@ class Camera:
 
         Parameters
         ----------
-        feature : `str`
+        feature : str
             a feature that is a valid key to self.features
-        value : `str`, `float`, `int`, or `bool`
+        value : str, float, int, or bool
             the value of the feature
 
         """
@@ -192,12 +191,12 @@ class Camera:
 
         Parameters
         ----------
-        feature : `str`
+        feature : str
             a feature that is a valid key to self.features
 
         Returns
         -------
-        `str`, `float`, `int`, or `bool`
+        str, float, int, or bool
             varies with the feature, see the values in the self.features dict
         """
         url = f'{self.addr}/feature/{feature}'
@@ -213,13 +212,13 @@ class Camera:
 
         Parameters
         ----------
-        feature : `str`
+        feature : str
             a feature that is a valid key to self.features
 
         Returns
         -------
-        `dict`
-            with keys `type`.  May also include keys `min` and `max` for
+        dict
+            with keys type.  May also include keys min and max for
             numerical features, or a key of "options" for enums, and "maxLength"
             for strings
 
@@ -234,14 +233,14 @@ class Camera:
 
         Parameters
         ----------
-        t : `str`, `numbers.Number`, or `astropy.units.Quantity`
+        t : str, numbers.Number, or astropy.units.Quantity
             something process_exposure_time can turn into the format expected
             by the server.  See help(andor.process_exposure_time).
 
 
         Returns
         -------
-        `float` or `astropy.units.Quantity`
+        float or astropy.units.Quantity
             if float, seconds.  Return type depends on self.time_convention
 
         """
@@ -265,13 +264,13 @@ class Camera:
 
         Parameters
         ----------
-        dict_ : `dict`
+        dict_ : dict
             dictionary with keys left, top, width, height.
 
 
         Returns
         -------
-        dict_ : `dict`
+        dict_ : dict
             dictionary with keys left, top, width, height.
 
         """
@@ -289,12 +288,12 @@ class Camera:
 
         Parameters
         ----------
-        fctr : `int`
+        fctr : int
             binning to apply, symmetric in H and V.
 
         Returns
         -------
-        `int`
+        int
             the binning
 
         """
@@ -315,11 +314,11 @@ class Camera:
 
         Parameters
         ----------
-        on : `bool`, optional
+        on : bool, optional
             whether the fan should be on (true) or off (false)
 
         Returns
-        `bool`
+        bool
             if the fan is on (true) or off (false)
 
         """
@@ -338,11 +337,11 @@ class Camera:
 
         Parameters
         ----------
-        on : `bool`, optional
+        on : bool, optional
             whether the TEC cooler should be on (true) or off (false)
 
         Returns
-        `bool`
+        bool
             if the TEC cooler is on (true) or off (false)
 
         """
@@ -357,7 +356,6 @@ class Camera:
             raise_err(resp)
             return
 
-    @property
     def temperature(self):
         """Current sensor temperature in Celcius."""
         resp = requests.get(self.addr + "/temperature")
@@ -375,12 +373,12 @@ class Camera:
 
         Parameters
         ----------
-        valueS : `str`, optional
+        valueS : str, optional
             a string representing a temperature.  Must be in self.temperature_setpt_options.
 
         Returns
         -------
-        `str`
+        str
             the current temperature setpoint, in Celcius
 
         """
@@ -395,14 +393,12 @@ class Camera:
             raise_err(resp)
             return
 
-    @property
     def temperature_setpt_options(self):
         """Currently allowed temperature setpoint options."""
         resp = requests.get(self.addr + '/temperature-setpoint-options')
         raise_err(resp)
         return resp.json()
 
-    @property
     def cooling_status(self):
         """Current cooling status."""
         resp = requests.get(self.addr + "/temperature-status")
@@ -416,14 +412,14 @@ class Camera:
 
         Parameters
         ----------
-        exposure_time : `str`, `numbers.Number`, or `astropy.units.Quantity`
+        exposure_time : str, numbers.Number, or astropy.units.Quantity
             something process_exposure_time can turn into the format expected
             by the server.  See help(andor.process_exposure_time).
-        fmt : `str`, {'fits', 'jpg', 'png'}, optional
+        fmt : str, {'fits', 'jpg', 'png'}, optional
             the format to retrieve the image as.
             If fits, the ret parameter is used, otherwise it is ignored.
             Fit images are captured with 16-bit precision, other options are 8-bit.
-        ret : `str`, {'array', 'hdu', 'file'}, optional
+        ret : str, {'array', 'hdu', 'file'}, optional
             Only used if fmt='fits'.
             If array, returns a numpy array
             If hdu, returns an astropy.io.fits.HDU object.  The user is
@@ -431,7 +427,7 @@ class Camera:
 
         Returns
         -------
-        `numpy.ndarray` or `astropy.io.fits.HDU`
+        numpy.ndarray or astropy.io.fits.HDU
             either an array holding the image data as uint8 or uint16,
             or an HDU object. Users must close the HDU object.
 
@@ -465,15 +461,15 @@ class Camera:
 
         Parameters
         ----------
-        `frames` : `int`
+        frames : int
             number of frames to take in the sequence
-        `fps` : `float`
+        fps : float
             framerate to use.  Ensure it is supported by the camera
-        serverSpool : `int`
+        serverSpool : int
             size of the spool (in frames) to use on the server to buffer,
             if the client can't keep up.  If Zero, the spool size is set to
             frames*fps, which may cause out of memory errors.
-        downloads : `str`, optional, {'each', 'all'}
+        downloads : str, optional, {'each', 'all'}
             flag for controlling how images are downlinked from the camera server.
             each downloads each frame one at a time.
             all downloads the entire burst in one transfer
@@ -486,7 +482,7 @@ class Camera:
 
         Returns
         -------
-        `generator`
+        generator
             if downloads == each, a generator yielding {frames} 2D ndarrays.
             if downloads == all, a generator yielding one 3D ndarray
 
@@ -520,12 +516,12 @@ class Camera:
 
         Parameters
         ----------
-        fctr : `int`
+        fctr : int
             gain factor, [0,300] if self.em_mode() != 'Advanced', else [0,1000].
 
         Returns
         -------
-        `int`
+        int
             the EM gain
 
         """
@@ -543,12 +539,12 @@ class Camera:
 
         Parameters
         ----------
-        mode : `str`, {'Advanced'}
+        mode : str, {'Advanced'}
             em gain mode
 
         Returns
         -------
-        `str`
+        str
             the current EM gain mode
 
         """
@@ -561,7 +557,6 @@ class Camera:
             resp = requests.post(url, json={'str': mode})
             raise_err(resp)
 
-    @property
     def em_gain_range(self):
         """Min and max values for EM gain in the current configuration."""
         resp = requests.get(f'{self.addr}/em-gain-range')
@@ -574,12 +569,12 @@ class Camera:
 
         Parameters
         ----------
-        open : `bool`
+        open : bool
             if True, the shutter opens
 
         Returns
         -------
-        `bool`
+        bool
             True if the shutter is open
 
         """
@@ -597,14 +592,14 @@ class Camera:
 
         Parameters
         ----------
-        automatic : `bool`
+        automatic : bool
             if True, the camera automatically controls the shutter opening, closing
             and timing.  If False, the user must manually manipulate the shutter
             with the shutter() function
 
         Returns
         -------
-        `bool`
+        bool
             True if the shutter is automatically controlled/managed by the camera.
 
         """
@@ -622,12 +617,12 @@ class Camera:
 
         Parameters
         ----------
-        texp_S : `float`
+        texp_S : float
             Shutter speed in seconds.  If None, gets.
 
         Returns
         -------
-        `float`
+        float
             Shutter speed in seconds
 
         """
@@ -641,9 +636,6 @@ class Camera:
             raise_err(resp)
 
 
-SDK3Cam = Camera
-
-
 class EMCCD(Camera):
     """Subclass of Camera that forbids excessively cold temperatures."""
 
@@ -652,12 +644,12 @@ class EMCCD(Camera):
 
         Parameters
         ----------
-        valueS : `str`, optional
+        valueS : str, optional
             a string representing a temperature.  Must be in self.temperature_setpt_options.
 
         Returns
         -------
-        `str`
+        str
             the current temperature setpoint, in Celcius
 
         """

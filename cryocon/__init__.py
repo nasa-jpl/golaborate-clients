@@ -15,7 +15,7 @@ class TemperatureMonitor:
 
         Parameters
         ----------
-        addr : `str`
+        addr : str
             "root" address of the go-hcit server, one level above the
             "/read" route.  Must incude port.  startswith http not needed.
 
@@ -28,7 +28,6 @@ class TemperatureMonitor:
 
         self.addr = addr
 
-    @property
     @retry(max_retries=2, interval=1)
     def version(self):
         """The model name and firmware version."""
@@ -42,13 +41,13 @@ class TemperatureMonitor:
 
         Parameters
         ----------
-        ch : `str`, optional
+        ch : str, optional
             if all, reads all channels and returns a list of floats, else returns a single float.
             Channels without monitors on them are encoded as NaN.
 
         Returns
         -------
-        `list` of float or `float`
+        list of float or float
 
         """
         ch = ch.upper()

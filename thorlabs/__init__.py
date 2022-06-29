@@ -19,10 +19,10 @@ class ITC4000:
 
         Parameters
         ----------
-        addr : `str`
+        addr : str
             a network address, with port added.  "host:port".
             HTTP prefix not needed.
-        convention : `str`, {'float', 'units'}
+        convention : str, {'float', 'units'}
             if float, uses floats for current and temperature.
             Else uses astropy quantities.
 
@@ -36,14 +36,14 @@ class ITC4000:
 
         Parameters
         ----------
-        value : `float` or `astropy.units.Quantity`
+        value : float or astropy.units.Quantity
             current.  If float, units of mA.
 
         Returns
         -------
-        `float`
+        float
             value in mA
-        `astropy.units.Quantity`
+        astropy.units.Quantity
             value
 
         """
@@ -72,12 +72,12 @@ class ITC4000:
 
         Parameters
         ----------
-        value : `bool`
+        value : bool
             if True, turns emission off.  If false, turns emission off.  Gets on None.
 
         Returns
         -------
-        `bool`
+        bool
             emission state (true=on)
 
         """

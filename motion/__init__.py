@@ -27,14 +27,12 @@ class Axis:
         self.addr = niceaddr(addr)
         self.name = name
 
-    @retry(max_retries=3, interval=5)
     def home(self):
         """Home the axis."""
         url = f'{self.addr}/axis/{self.name}/home'
         resp = requests.post(url)
         raise_err(resp)
 
-    @retry(max_retries=3, interval=5)
     def enable(self):
         """Enable the axis."""
         url = f'{self.addr}/axis/{self.name}/enabled'
@@ -42,7 +40,6 @@ class Axis:
         resp = requests.post(url, json=payload)
         raise_err(resp)
 
-    @retry(max_retries=3, interval=5)
     def disable(self):
         """Disable the axis."""
         url = f'{self.addr}/axis/{self.name}/enabled'
@@ -50,15 +47,12 @@ class Axis:
         resp = requests.post(url, json=payload)
         raise_err(resp)
 
-    @retry(max_retries=3, interval=5)
     def initialize(self):
         """Initialize the axis."""
         url = f'{self.addr}/axis/{self.name}/initialize'
         resp = requests.post(url)
         raise_err(resp)
 
-    @property
-    @retry(max_retries=3, interval=5)
     def enabled(self):
         """Boolean for if the axis is enabled."""
         url = f'{self.addr}/axis/{self.name}/enabled'
@@ -66,8 +60,6 @@ class Axis:
         raise_err(resp)
         return resp.json()['bool']
 
-    @property
-    @retry(max_retries=3, interval=5)
     def pos(self):
         """Position of the axis."""
         url = f'{self.addr}/axis/{self.name}/pos'
@@ -75,15 +67,12 @@ class Axis:
         raise_err(resp)
         return resp.json()['f64']
 
-    @property
-    @retry(max_retries=3, interval=5)
     def limits(self):
         """Limits of the axis."""
         resp = requests.get(f'{self.addr}/axis/{self.name}/limits')
         raise_err(resp)
         return resp.json()
 
-    @retry(max_retries=3, interval=5)
     def velocity(self, value=None):
         """Velocity setpoint of the axis.
 
@@ -108,7 +97,6 @@ class Axis:
             resp = requests.post(url, json=payload)
             raise_err(resp)
 
-    @retry(max_retries=3, interval=5)
     def move_abs(self, pos, sync=True, wait_inpos_kwargs=None):
         """Move the axis to an absolute position.
 
@@ -132,7 +120,6 @@ class Axis:
         if not sync and wait_inpos_kwargs is not None:
             warnings.warn('move_abs: sync and wait_inpos_kwargs are deprecated and have no effect')
 
-    @retry(max_retries=3, interval=5)
     def move_rel(self, pos, sync=True, wait_inpos_kwargs=None):
         """Move the axis by a relative amount.
 
@@ -150,7 +137,6 @@ class Axis:
         if not sync and wait_inpos_kwargs is not None:
             warnings.warn('move_abs: sync and wait_inpos_kwargs are deprecated and have no effect')
 
-    @retry(max_retries=3, interval=5)
     def synchronous(self, sync=None):
         """Synchronous mode for the axis.
 
@@ -179,8 +165,6 @@ class Axis:
             resp = requests.post(url, json=payload)
             raise_err(resp)
 
-    @property
-    @retry(max_retries=3, interval=5)
     def inpos(self):
         """Position of the axis."""
         url = f'{self.addr}/axis/{self.name}/inposition'
@@ -208,7 +192,7 @@ class Axis:
         """
         # check the first time, profile the time taken to check
         start = time.time()
-        inpos = self.inpos
+        inpos = self.inpos()
         end = time.time()
         deltaT = end - start
         wait_t = deltaT * controller_latency_scale

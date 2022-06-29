@@ -14,7 +14,7 @@ class Chiller:
 
         Parameters
         ----------
-        addr : `str`
+        addr : str
             a network address, with port added.  "host:port".
             HTTP prefix not needed.
 
@@ -35,12 +35,12 @@ class Chiller:
 
         Parameters
         ----------
-        celcius : `float`, optional
+        celcius : float, optional
             temperature, in degrees celcius to set the setpoint to.  Gets if None.
 
         Returns
         -------
-        `float`
+        float
             the current setpoint in degrees celcius
 
         """

@@ -18,7 +18,7 @@ class FunctionGenerator:
 
         Parameters
         ----------
-        addr : `str`
+        addr : str
             a network address, with port added.  "host:port".
             HTTP prefix not needed.
 
@@ -37,13 +37,13 @@ class FunctionGenerator:
 
         Parameters
         ----------
-        signal_type : `str`, {'sine', 'square', 'ramp', 'pulse', 'noise'}
+        signal_type : str, {'sine', 'square', 'ramp', 'pulse', 'noise'}
             signal type to generate with the hardware
             if None, returns the value from the generator
 
         Returns
         -------
-        `str`
+        str
             the signal type being generated
 
         """
@@ -63,13 +63,13 @@ class FunctionGenerator:
 
         Parameters
         ----------
-        volts : `float`
+        volts : float
             voltage used, peak to peak
             if None, returns the value from the generator
 
         Returns
         -------
-        `float`
+        float
             the voltage being generated
 
         """
@@ -89,13 +89,13 @@ class FunctionGenerator:
 
         Parameters
         ----------
-        hertz : `float`
+        hertz : float
             frequency used
             if None, returns the value from the generator
 
         Returns
         -------
-        `float`
+        float
             the frequency being generated
 
         """
@@ -115,13 +115,13 @@ class FunctionGenerator:
 
         Parameters
         ----------
-        volts : `float`
+        volts : float
             volts used, peak to peak
             if None, returns the value from the generator
 
         Returns
         -------
-        `float`
+        float
             the voltage offset used
 
         """
@@ -141,13 +141,13 @@ class FunctionGenerator:
 
         Parameters
         ----------
-        on : `bool`
+        on : bool
             output state, on=True -> on
             if None, returns the value from the generator
 
         Returns
         -------
-        `bool`
+        bool
             if the generator is currently outputting
 
         """
@@ -170,7 +170,7 @@ class FunctionGenerator:
 
         Parameters
         ----------
-        ary : `numpy.ndarray`
+        ary : numpy.ndarray
             ndarray with ndim == 1, dtype == uint16
             for the Agilent 33250A, len < 65535 as well
 
@@ -200,7 +200,7 @@ class Oscilloscope:
 
         Parameters
         ----------
-        addr : `str`
+        addr : str
             a network address, with port added.  "host:port".
             HTTP prefix not needed.
 
@@ -218,14 +218,14 @@ class Oscilloscope:
 
         Parameters
         ----------
-        channel : `str`
+        channel : str
             which channel to set the scale for
-        volts_full_scale : `float`
+        volts_full_scale : float
             number of volts full scale on the scope screen
 
         Returns
         -------
-        `float`
+        float
             volts full scale, if input is None
 
         """
@@ -244,12 +244,12 @@ class Oscilloscope:
 
         Parameters
         ----------
-        seconds_full_width : `float`
+        seconds_full_width : float
             number of seconds of data on the scope screen
 
         Returns
         -------
-        `float`
+        float
             width of the scope window, if input is None
 
         """
@@ -268,12 +268,12 @@ class Oscilloscope:
 
         Parameters
         ----------
-        bits : `int`
+        bits : int
             number of bits, 8 for 8 bit, 16 for 16-bit, etc
 
         Returns
         -------
-        `int`
+        int
             bit depth, if input is None
 
         """
@@ -292,12 +292,12 @@ class Oscilloscope:
 
         Parameters
         ----------
-        samples_per_second : `int`
+        samples_per_second : int
             number of samples per second
 
         Returns
         -------
-        `int`
+        int
             samples per second, if input is None
 
         """
@@ -316,12 +316,12 @@ class Oscilloscope:
 
         Parameters
         ----------
-        samples : `int`
+        samples : int
             number of samples of data
 
         Returns
         -------
-        `int`
+        int
             samples, if input is None
 
         """
@@ -340,12 +340,12 @@ class Oscilloscope:
 
         Parameters
         ----------
-        mode : `str`
+        mode : str
             acquisition mode, nominally "RTIME" for realtime
 
         Returns
         -------
-        `str`
+        str
             acquisition mode if input is None
 
         """
@@ -364,12 +364,12 @@ class Oscilloscope:
 
         Parameters
         ----------
-        channels : `iterable` of `str`
+        channels : iterable of str
             which channels to acquire
 
         Returns
         -------
-        `dict`
+        dict
             with keys:
                 - started -- datetime.datetime
                 - time -- linear array of time in seconds
@@ -399,7 +399,7 @@ class DAQ:
 
         Parameters
         ----------
-        addr : `str`
+        addr : str
             a network address, with port added.  "host:port".
             HTTP prefix not needed.
 
@@ -418,9 +418,9 @@ class DAQ:
 
         Parameters
         ----------
-        channel : `int`
+        channel : int
             which channel to set the label for
-        label : `str`
+        label : str
             the label to use
 
         """
@@ -436,15 +436,15 @@ class DAQ:
 
         Parameters
         ----------
-        measurement : `str`, {'volt', 'curr'}
+        measurement : str, {'volt', 'curr'}
             voltage or current
-        range_ : `float`
+        range_ : float
             symmetric range to digitize over
-        resolution : `float`
+        resolution : float
             resolution to digitize with
-        channels : `iterable` of `int`
+        channels : iterable of int
             list of channels to configure.  Accepts single int, too.
-        dc : `bool`
+        dc : bool
             if True, configure for DC coupling; else AC.
 
         """
@@ -463,12 +463,12 @@ class DAQ:
 
         Parameters
         ----------
-        samples_per_second : `int`
+        samples_per_second : int
             number of samples per second
 
         Returns
         -------
-        `int`
+        int
             number of samples per second the DAQ makes
 
         """
@@ -489,12 +489,12 @@ class DAQ:
 
         Parameters
         ----------
-        channel : `int`
+        channel : int
             which channel to use
 
         Returns
         -------
-        `int`
+        int
             the channel being used
 
         """
@@ -515,12 +515,12 @@ class DAQ:
 
         Parameters
         ----------
-        samples : `int`
+        samples : int
             how many samples are in the record
 
         Returns
         -------
-        `int`
+        int
             the channel being used
 
         """
