@@ -4,6 +4,10 @@ import time
 from functools import wraps
 
 
+class DoNotRepeat(Exception):
+    pass
+
+
 def retry(max_retries=2, interval=1):
     # simplified retry decorator, for better windows support
 
@@ -18,6 +22,16 @@ def retry(max_retries=2, interval=1):
                     result = func(*args, **kwargs)
                     last_exception = None
                     break
+                except DoNotRepeat as e:
+                    funcname = func.__name__
+                    obj = getattr(func, '__self__', None)
+                    if obj is not None:
+                        # method, write it out nicely
+                        clsname = obj.__self__.__class__.__name__
+                        msg_front = f'{clsname}.{funcname}'
+                    else:
+                        msg_front = f'{funcname}'
+                    raise ValueError(f'{msg_front} was not supported by the server or hardware')
                 except Exception as e:
                     last_exception = e
                     logging.info(f'Exception {e} encountered during {func.__name__}, retrying ({n}/max_retries)')

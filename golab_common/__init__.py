@@ -1,4 +1,5 @@
 """Common functions and macros."""
+from .retry import DoNotRepeat
 
 
 def raise_err(resp):
@@ -16,6 +17,8 @@ def raise_err(resp):
     server or between the server and the camera/SDK
 
     """
+    if resp.status_code == 404:
+        raise DoNotRepeat('the called function was not supported by the server or hardware')
     if resp.status_code != 200:
         raise Exception(resp.text)
 
