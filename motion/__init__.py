@@ -33,6 +33,12 @@ class Axis:
         resp = requests.post(url)
         raise_err(resp)
 
+    def stop(self):
+        """Stop the axis."""
+        url = f'{self.addr}/axis/{self.name}/stop'
+        resp = requests.post(url)
+        raise_err(resp)
+
     def enable(self):
         """Enable the axis."""
         url = f'{self.addr}/axis/{self.name}/enabled'
@@ -56,6 +62,13 @@ class Axis:
     def enabled(self):
         """Boolean for if the axis is enabled."""
         url = f'{self.addr}/axis/{self.name}/enabled'
+        resp = requests.get(url)
+        raise_err(resp)
+        return resp.json()['bool']
+
+    def homed(self):
+        """Boolean for if the axis is homed."""
+        url = f'{self.addr}/axis/{self.name}/home'
         resp = requests.get(url)
         raise_err(resp)
         return resp.json()['bool']
