@@ -24,7 +24,7 @@ def raise_err(resp):
 
 
 def niceaddr(addr):
-    """ensure addr begins with http://"""
+    """Ensure addr begins with http://."""
     if not addr.startswith('http://'):
         addr = 'http://' + addr
 

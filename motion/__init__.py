@@ -26,19 +26,61 @@ class Axis:
         """
         self.addr = niceaddr(addr)
         self.name = name
+        # maps method_name -> URL
+        self.urls = {
+            'home':        '/axis/{axis}/home',
+            'stop':        '/axis/{axis}/stop',
+            'enable':      '/axis/{axis}/enabled',
+            'disable':     '/axis/{axis}/enabled',
+            'initialize':  '/axis/{axis}/initialize',
+            'enabled':     '/axis/{axis}/enabled',
+            'homed':       '/axis/{axis}/home',
+            'pos':         '/axis/{axis}/pos',
+            'limits':      '/axis/{axis}/limits',
+            'velocity':    '/axis/{axis}/velocity',
+            'move_abs':    '/axis/{axis}/pos',
+            'move_rel':    '/axis/{axis}/pos',
+            'synchronous': '/axis/{axis}/synchronous',
+            'inpos':       '/axis/{axis}/inposition',
+        }
+        self.routes = None
 
+    def does_support(self, method):
+        """Return True if this axis supports the given method, else False.
+
+        Parameters
+        ----------
+        method : callable
+            bound method of this instance, e.g.
+            a = Axis()
+            a.does_support(a.inpos)
+
+        """
+        # only get routes one time, does not change dynamically
+        # no need to spam network traffic
+        if self.routes is None:
+            meta_url = f'{self.addr}/endpoints'
+            resp = requests.get(meta_url)
+            raise_err(resp)
+            self.routes = resp.json()
+
+        return self.urls[method.__name__] in self.routes
+
+    @retry(max_retries=3, interval=2)
     def home(self):
         """Home the axis."""
         url = f'{self.addr}/axis/{self.name}/home'
         resp = requests.post(url)
         raise_err(resp)
 
+    @retry(max_retries=3, interval=2)
     def stop(self):
         """Stop the axis."""
         url = f'{self.addr}/axis/{self.name}/stop'
         resp = requests.post(url)
         raise_err(resp)
 
+    @retry(max_retries=3, interval=2)
     def enable(self):
         """Enable the axis."""
         url = f'{self.addr}/axis/{self.name}/enabled'
@@ -46,6 +88,7 @@ class Axis:
         resp = requests.post(url, json=payload)
         raise_err(resp)
 
+    @retry(max_retries=3, interval=2)
     def disable(self):
         """Disable the axis."""
         url = f'{self.addr}/axis/{self.name}/enabled'
@@ -53,12 +96,14 @@ class Axis:
         resp = requests.post(url, json=payload)
         raise_err(resp)
 
+    @retry(max_retries=3, interval=2)
     def initialize(self):
         """Initialize the axis."""
         url = f'{self.addr}/axis/{self.name}/initialize'
         resp = requests.post(url)
         raise_err(resp)
 
+    @retry(max_retries=3, interval=2)
     def enabled(self):
         """Boolean for if the axis is enabled."""
         url = f'{self.addr}/axis/{self.name}/enabled'
@@ -66,6 +111,7 @@ class Axis:
         raise_err(resp)
         return resp.json()['bool']
 
+    @retry(max_retries=3, interval=2)
     def homed(self):
         """Boolean for if the axis is homed."""
         url = f'{self.addr}/axis/{self.name}/home'
@@ -73,6 +119,7 @@ class Axis:
         raise_err(resp)
         return resp.json()['bool']
 
+    @retry(max_retries=3, interval=2)
     def pos(self):
         """Position of the axis."""
         url = f'{self.addr}/axis/{self.name}/pos'
@@ -80,12 +127,14 @@ class Axis:
         raise_err(resp)
         return resp.json()['f64']
 
+    @retry(max_retries=3, interval=2)
     def limits(self):
         """Limits of the axis."""
         resp = requests.get(f'{self.addr}/axis/{self.name}/limits')
         raise_err(resp)
         return resp.json()
 
+    @retry(max_retries=3, interval=2)
     def velocity(self, value=None):
         """Velocity setpoint of the axis.
 
@@ -110,7 +159,8 @@ class Axis:
             resp = requests.post(url, json=payload)
             raise_err(resp)
 
-    def move_abs(self, pos, sync=True, wait_inpos_kwargs=None):
+    @retry(max_retries=3, interval=2)
+    def move_abs(self, pos):
         """Move the axis to an absolute position.
 
         Parameters
@@ -130,10 +180,8 @@ class Axis:
         resp = requests.post(url, json=payload)
         raise_err(resp)
 
-        if not sync and wait_inpos_kwargs is not None:
-            warnings.warn('move_abs: sync and wait_inpos_kwargs are deprecated and have no effect')
-
-    def move_rel(self, pos, sync=True, wait_inpos_kwargs=None):
+    @retry(max_retries=3, interval=2)
+    def move_rel(self, pos):
         """Move the axis by a relative amount.
 
         Parameters
@@ -147,9 +195,7 @@ class Axis:
         resp = requests.post(url, json=payload, params={'relative': True})
         raise_err(resp)
 
-        if not sync and wait_inpos_kwargs is not None:
-            warnings.warn('move_abs: sync and wait_inpos_kwargs are deprecated and have no effect')
-
+    @retry(max_retries=3, interval=2)
     def synchronous(self, sync=None):
         """Synchronous mode for the axis.
 
@@ -178,6 +224,7 @@ class Axis:
             resp = requests.post(url, json=payload)
             raise_err(resp)
 
+    @retry(max_retries=3, interval=2)
     def inpos(self):
         """Position of the axis."""
         url = f'{self.addr}/axis/{self.name}/inposition'
@@ -185,6 +232,7 @@ class Axis:
         raise_err(resp)
         return resp.json()['bool']
 
+    @retry(max_retries=3, interval=2)
     def wait_inpos(self, max_check=None, max_time=None, min_interval=0.1, controller_latency_scale=4):
         """Return when an axis to be in position.
 
@@ -258,6 +306,7 @@ class Controller:
             setattr(self, axis, ax)
             setattr(self, axis.lower(), ax)
 
+    @retry(max_retries=3, interval=2)
     def raw(self, text):
         """Send a string to the controller and get back any response.
 
