@@ -14,7 +14,7 @@ def retry(max_retries=2, interval=1):
     # no use of select from stdlib, other features not used removed
     def decorator(func):
         @wraps(func)
-        def wrapper(func, *args, **kwargs):
+        def wrapper(*args, **kwargs):
             result = None
             last_exception = None
             for n in range(max_retries):
