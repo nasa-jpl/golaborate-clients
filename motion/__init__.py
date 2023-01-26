@@ -58,13 +58,18 @@ class Axis:
         """
         # only get routes one time, does not change dynamically
         # no need to spam network traffic
+        name = method.__name__
+        if name == 'wait_inpos':
+            # forward test to the actual check, wait_inpos is client side logic
+            name = 'inpos'
+
         if self.routes is None:
             meta_url = f'{self.addr}/endpoints'
             resp = requests.get(meta_url)
             raise_err(resp)
             self.routes = resp.json()
 
-        return self.urls[method.__name__] in self.routes
+        return self.urls[name] in self.routes
 
     @retry(max_retries=3, interval=2)
     def home(self):
@@ -114,7 +119,7 @@ class Axis:
     @retry(max_retries=3, interval=2)
     def homed(self):
         """Boolean for if the axis is homed."""
-        url = f'{self.addr}/axis/{self.name}/home'
+        url = f'{self.addr}/axis/{self.name}/homed'
         resp = requests.get(url)
         raise_err(resp)
         return resp.json()['bool']
