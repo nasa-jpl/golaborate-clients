@@ -34,7 +34,7 @@ class Axis:
             'disable':     '/axis/{axis}/enabled',
             'initialize':  '/axis/{axis}/initialize',
             'enabled':     '/axis/{axis}/enabled',
-            'homed':       '/axis/{axis}/home',
+            'homed':       '/axis/{axis}/homed',
             'pos':         '/axis/{axis}/pos',
             'limits':      '/axis/{axis}/limits',
             'velocity':    '/axis/{axis}/velocity',
