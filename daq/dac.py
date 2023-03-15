@@ -194,7 +194,7 @@ class DAC:
             the triggering mode
 
         """
-        url = f'{self.addr}/triggering-mode'
+        url = f'{self.addr}/trigger-mode'
         if mode is None:
             resp = requests.get(url, json={'channel': channel})
             raise_err(resp)
