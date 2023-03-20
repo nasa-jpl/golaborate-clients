@@ -126,22 +126,32 @@ class DAC:
             raise_err(resp)
 
     def simultaneous(self, channel, boolean=None):
-        """Configure the output range of a channel.
+        """Configure a channel for simultaneous triggering (True).
+
+        The DAC triggers all channels for which simultaneous is True in a ganged
+        fashion.  All of the channels should be written to with .output and a
+        list to observe the desired behavior, or used in one of the waveform
+        triggering modes.
+
+        e.g.,
+        chans = [1,2,3]
+        for chan in chans:
+            dac.simultaneous(chan, True)
+
+        dac.output_multi(chans, [0.001, 0.002, 0.003])
 
         Parameters
         ----------
         channel : int
             a channel identifier
-        range : str, optional
-            a CSV of lower and upper voltages; <low>,<high>.
-            E.g., "0,10" or "-5,5" or "-2.5,7.5", etc.
-            Voltages in volts.
-            if None, returns the range which is active
+        boolean : bool, optional
+            True  -> simultaneous triggering
+            False -> asynchronous triggering
 
         Returns
         -------
-        str
-            range of a channel, formatted as above.
+        bool
+            True if the channel is triggered simultaneously with others
 
         """
         url = f'{self.addr}/simultaneous'
@@ -224,7 +234,8 @@ class DAC:
         ----------
         nanoseconds : int
             number of nanoseconds between samples at the output.
-            For the Acromag AP235's internal timer, must be modulo 32.
+            For the Acromag AP235's internal timer, must be / will be rounded
+            modulo 32.
 
         Returns
         -------
