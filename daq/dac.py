@@ -1,4 +1,5 @@
 """DAC is the arm of DAQ that deals with D to A."""
+import warnings
 
 import requests
 
@@ -258,3 +259,30 @@ class DAC:
             return self.timer_period_ns(None) / 1e9
         else:
             return self.timer_period_ns(seconds*1e9)
+
+    def load_waveform(self, filename, period_ns):
+        """Load a waveform; compatible with Acromag AP235 and dacsrv only.
+
+        Parameters
+        ----------
+        filename : str
+            name of the file, **on the PC running dacsrv**
+            either adjacent to the executable, or an absolute path
+        period_ns : int
+            inter-sample period in nanoseconds
+
+        Notes
+        -----
+        call dac.start() after, to begin playable
+        if playback is stopped, calling start again is undefined behavior;
+        re-load the waveform first.
+
+        """
+        if not isinstance(period_ns, int):
+            warnings.warn(f'{period_ns=} was not an int, casting...')
+            period_ns = int(period_ns)
+
+        url = f'{self.addr}/load-waveform'
+        payload = {'filename': filename}
+        resp = requests.post(url, json=payload)
+        raise_err(resp)
